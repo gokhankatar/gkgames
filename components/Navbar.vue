@@ -14,15 +14,13 @@
       <div class="actions d-flex justify-center align-center ga-4">
         <v-icon
           @click="_store.changeTheme"
-          class="transition mx-3"
+          class="transition theme-icon mx-3"
           size="large"
-          :class="_store.theme === 'light' ? 'theme-icon-light' : 'theme-icon-dark'"
           :icon="_store.theme === 'light' ? 'mdi-weather-night' : 'mdi-weather-sunny'"
         />
-        <v-btn variant="tonal" class="transition rounded-lg login-btn" text="Login" />
+        <v-btn variant="outlined" class="transition rounded-lg login-btn" text="Login" />
         <v-btn
-          variant="tonal"
-          :color="_store.theme === 'light' ? 'blue-darken-3' : 'blue-lighten-1'"
+          variant="outlined"
           class="transition rounded-lg signup-btn"
           text="Signup"
         />
@@ -33,11 +31,12 @@
   <v-row class="navbar-search d-flex justify-start align-center ga-5">
     <v-form class="input w-50">
       <v-text-field
-        :color="_store.theme === 'light' ? 'blue-darken-3' : 'blue-lighten-1'"
+        color="#00e5ff"
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         rounded="xl"
         placeholder="Search Game"
+        clearable
       />
     </v-form>
     <span class="link transition rounded cursor-pointer pa-2 text-subtitle-1"
@@ -59,10 +58,23 @@ const router = useRouter();
 <style scoped>
 @import url(/assets/css/main.css);
 
-.theme-icon-light:hover {
-  color: #039be5;
+.login-btn {
+  color: #546e7a;
+  border-color: #546e7a;
 }
-.theme-icon-dark:hover {
+.login-btn:hover {
+  background-color: #546e7a;
+  color: #fff;
+}
+.signup-btn {
+  color: #00e5ff;
+  border-color: #00e5ff;
+}
+.signup-btn:hover {
+  background-color: #00e5ff;
+  color: #fff;
+}
+.theme-icon:hover {
   color: #00e5ff;
 }
 .link:hover {
