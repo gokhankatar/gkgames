@@ -1,0 +1,29 @@
+{
+  "name": "nuxt-app",
+  "author": {
+    "name": "Gokhan",
+    "surname": "Katar",
+    "title": "Front End Developer",
+    "email": "katar_gokhan@hotmail.com",
+    "twitter": "gokhan_crypto"
+  },
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev --open",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@pinia/nuxt": "^0.5.5",
+    "nuxt": "^3.13.0",
+    "nuxt-swiper": "^1.2.2",
+    "pinia": "^2.2.4",
+    "pinia-plugin-persistedstate": "^4.0.2",
+    "vue": "latest",
+    "vue-router": "latest",
+    "vuetify-nuxt-module": "^0.18.3"
+  }
+}
