@@ -39,13 +39,28 @@
         clearable
       />
     </v-form>
-    <span class="link transition rounded cursor-pointer pa-2 text-subtitle-1"
+    <span
+      @click="router.replace('/')"
+      :class="
+        !route.fullPath.includes('brows') && !route.fullPath.includes('allgames')
+          ? 'active-link'
+          : ''
+      "
+      class="link transition rounded cursor-pointer pa-2 text-subtitle-1"
       >Discover</span
     >
-    <span class="link transition rounded cursor-pointer pa-2 text-subtitle-1"
+    <span
+      @click="router.replace('/allgames')"
+      :class="route.fullPath.includes('allgames') ? 'active-link' : ''"
+      class="link transition rounded cursor-pointer pa-2 text-subtitle-1"
+      >All Games</span
+    >
+    <span
+      @click="router.replace('/browse')"
+      :class="route.fullPath.includes('browse') ? 'active-link' : ''"
+      class="link transition rounded cursor-pointer pa-2 text-subtitle-1"
       >Browse</span
     >
-    <span class="link transition rounded cursor-pointer pa-2 text-subtitle-1">News</span>
   </v-row>
 </template>
 <script lang="ts" setup>
@@ -54,6 +69,7 @@ import store from "~/store/store";
 
 const _store = store();
 const router = useRouter();
+const route = useRoute();
 </script>
 <style scoped>
 @import url(/assets/css/main.css);
@@ -80,5 +96,10 @@ const router = useRouter();
 .link:hover {
   background-color: #78909c;
   color: #fff;
+}
+
+.active-link {
+  background-color: #0ae6ff !important;
+  color: #fff !important;
 }
 </style>

@@ -1,5 +1,7 @@
 <template>
-  <h3 class="text-h3 pa-3 bg-green-darken-1 rounded">/root</h3>
+  <div>
+    <h3 class="text-h3">home</h3>
+  </div>
 </template>
 <script lang="ts" setup></script>
 <style scoped></style>
