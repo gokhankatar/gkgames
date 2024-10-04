@@ -2,7 +2,13 @@
   <Loading v-if="isLoading" />
   <v-row v-if="!isLoading">
     <v-col
-      class="game-wrapper"
+      @click="
+        router.push({
+          path: `/allgames/${item.name}`,
+          query: { game: JSON.stringify(item) },
+        })
+      "
+      class="game-wrapper cursor-pointer"
       v-for="(item, index) of gamesList"
       :key="item.id"
       cols="12"
@@ -95,6 +101,7 @@
   </v-row>
 </template>
 <script lang="ts" setup>
+const router = useRouter();
 const isLoading = ref(false);
 const api_key = useRuntimeConfig().app.apiKey;
 const initialUrl = `https://api.rawg.io/api/games?key=${api_key}`;
@@ -110,7 +117,6 @@ const getAllGames = async (url: string) => {
 
     nextPageUrl.value = data?.next;
     previousPageUrl.value = data?.previous;
-    console.log(gamesList.value);
   } catch (error: any) {
     console.log(error.message);
   } finally {
