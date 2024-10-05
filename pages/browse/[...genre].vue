@@ -1,6 +1,16 @@
 <template>
   <Loading v-if="isLoading" />
-  
+  <v-row class="d-flex justify-space-between align-center" v-if="!isLoading">
+    <div class="content">
+      <h3 class="text-h5 text-lg-h2">{{ route.query.name }} Games</h3>
+      <hr class="mt-2 mb-10 w-75 w-md-100" color="#0AE6FF" />
+    </div>
+    <v-btn
+      @click="router.replace('/browse')"
+      prepend-icon="mdi-arrow-left"
+      text="Back to Browse"
+    />
+  </v-row>
   <v-row v-if="!isLoading">
     <v-col
       @click="
@@ -10,7 +20,7 @@
         })
       "
       class="game-wrapper cursor-pointer"
-      v-for="(item, index) of gamesList"
+      v-for="(item, index) of gamesList?.results"
       :key="item.id"
       cols="12"
       sm="6"
@@ -96,29 +106,30 @@
       </div>
     </v-col>
   </v-row>
-
   <v-row v-if="!isLoading" class="mt-15 flex justify-center align-center ga-3">
-    <v-btn v-if="previousPageUrl" @click="getAllGames(previousPageUrl)">prev page</v-btn>
-    <v-btn v-if="nextPageUrl" @click="getAllGames(nextPageUrl)">next page</v-btn>
+    <v-btn v-if="previousPageUrl" @click="getAllGamesForPage(previousPageUrl)"
+      >prev page</v-btn
+    >
+    <v-btn v-if="nextPageUrl" @click="getAllGamesForPage(nextPageUrl)">next page</v-btn>
   </v-row>
 </template>
 <script lang="ts" setup>
+definePageMeta({
+  layout: "single-game",
+});
+const route = useRoute();
 const router = useRouter();
 const isLoading = ref(false);
-const api_key = useRuntimeConfig().app.apiKey;
-const initialUrl = `https://api.rawg.io/api/games?key=${api_key}`;
 const previousPageUrl = ref(null);
 const nextPageUrl = ref(null);
-const gamesList = ref([]);
-
-const getAllGames = async (url: string) => {
+const gamesList = ref(null);
+const getGenres = async () => {
   try {
     isLoading.value = true;
-    const data = await $fetch(url);
-    gamesList.value = data?.results;
-
-    nextPageUrl.value = data?.next;
+    const data = await $fetch(route.query.endPoint as string);
     previousPageUrl.value = data?.previous;
+    nextPageUrl.value = data?.next;
+    gamesList.value = data;
   } catch (error: any) {
     console.log(error.message);
   } finally {
@@ -126,8 +137,22 @@ const getAllGames = async (url: string) => {
   }
 };
 
-onMounted(() => {
-  getAllGames(initialUrl);
+const getAllGamesForPage = async (page: any) => {
+  try {
+    isLoading.value = true;
+    const data = await $fetch(page);
+    previousPageUrl.value = data?.previous;
+    nextPageUrl.value = data?.next;
+    gamesList.value = data;
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    isLoading.value = false;
+  }
+};
+onMounted(async () => {
+  await nextTick();
+  getGenres();
 });
 </script>
 <style scoped>

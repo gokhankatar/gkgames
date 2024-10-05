@@ -1,6 +1,6 @@
 <template>
   <Loading v-if="isLoading" />
-  <v-row>
+  <v-row v-if="!isLoading">
     <v-btn
       @click="router.replace('/allgames')"
       prepend-icon="mdi-arrow-left"
@@ -24,10 +24,14 @@
         }"
         class="mySwiper"
       >
-        <div class="custom-swiper-button-prev rounded-lg d-none pa-2 pa-md-5 cursor-pointer">
+        <div
+          class="custom-swiper-button-prev rounded-lg d-none pa-2 pa-md-5 cursor-pointer"
+        >
           <v-icon icon="mdi-arrow-left" size="x-large" />
         </div>
-        <div class="custom-swiper-button-next rounded-lg d-none pa-2 pa-md-5 cursor-pointer">
+        <div
+          class="custom-swiper-button-next rounded-lg d-none pa-2 pa-md-5 cursor-pointer"
+        >
           <v-icon icon="mdi-arrow-right" size="x-large" />
         </div>
         <swiper-slide class="mySwiper" v-for="slide of game.short_screenshots">
@@ -154,12 +158,20 @@
 
   <v-row v-for="systemReq of game.platforms" class="my-5">
     <v-col cols="12" sm="6">
-      <v-card height="250" v-if="systemReq?.requirements_en" class="px-5 py-2 rounded-lg">
+      <v-card
+        height="250"
+        v-if="systemReq?.requirements_en?.minimum"
+        class="card-req px-5 py-2 rounded-lg"
+      >
         <v-card-text v-html="systemReq.requirements_en.minimum"></v-card-text>
       </v-card>
     </v-col>
     <v-col cols="12" sm="6">
-      <v-card height="250" v-if="systemReq?.requirements_en" class="px-5 py-2 rounded-lg">
+      <v-card
+        height="250"
+        v-if="systemReq?.requirements_en?.recommend"
+        class="card-req px-5 py-2 rounded-lg"
+      >
         <v-card-text v-html="systemReq.requirements_en.recommended"></v-card-text>
       </v-card>
     </v-col>
@@ -167,6 +179,10 @@
 </template>
 <script lang="ts" setup>
 import { SwiperFreeMode, SwiperNavigation, SwiperThumbs } from "#imports";
+
+definePageMeta({
+  layout: "single-game",
+});
 
 const router = useRouter();
 const route = useRoute();
@@ -189,6 +205,9 @@ onMounted(() => {
 });
 </script>
 <style scoped>
+.card-req {
+  overflow-y: auto;
+}
 .mySwiper {
   position: relative;
 }
