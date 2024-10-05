@@ -24,10 +24,10 @@
         }"
         class="mySwiper"
       >
-        <div class="custom-swiper-button-prev d-none pa-2 pa-md-5 cursor-pointer">
+        <div class="custom-swiper-button-prev rounded-lg d-none pa-2 pa-md-5 cursor-pointer">
           <v-icon icon="mdi-arrow-left" size="x-large" />
         </div>
-        <div class="custom-swiper-button-next d-none pa-2 pa-md-5 cursor-pointer">
+        <div class="custom-swiper-button-next rounded-lg d-none pa-2 pa-md-5 cursor-pointer">
           <v-icon icon="mdi-arrow-right" size="x-large" />
         </div>
         <swiper-slide class="mySwiper" v-for="slide of game.short_screenshots">
