@@ -204,7 +204,11 @@
   </v-row>
 </template>
 <script lang="ts" setup>
+import store from "~/store/store";
+
 const router = useRouter();
+const _store = store();
+
 const isLoading = ref(false);
 const genres = ref([]);
 const api_key = useRuntimeConfig().app.apiKey;

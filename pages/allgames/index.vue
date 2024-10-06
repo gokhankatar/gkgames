@@ -1,7 +1,7 @@
 <template>
-  <Loading v-if="isLoading" />
-  
-  <v-row v-if="!isLoading">
+  <Loading v-if="_store.isLoading" />
+
+  <v-row v-if="!_store.isLoading">
     <v-col
       @click="
         router.push({
@@ -10,7 +10,7 @@
         })
       "
       class="game-wrapper cursor-pointer"
-      v-for="(item, index) of gamesList"
+      v-for="(item, index) of _store.allGamesList?.results"
       :key="item.id"
       cols="12"
       sm="6"
@@ -97,39 +97,34 @@
     </v-col>
   </v-row>
 
-  <v-row v-if="!isLoading" class="mt-15 flex justify-center align-center ga-3">
-    <v-btn v-if="previousPageUrl" @click="getAllGames(previousPageUrl)">prev page</v-btn>
-    <v-btn v-if="nextPageUrl" @click="getAllGames(nextPageUrl)">next page</v-btn>
+  <v-row v-if="!_store.isLoading" class="mt-15 flex justify-center align-center ga-3">
+    <v-btn
+      class="rounded-xl"
+      color="cyan"
+      v-if="_store.allGamesList?.previous"
+      @click="_store.setCurrentPageUrl(_store.allGamesList?.previous)"
+      >prev page</v-btn
+    >
+    <v-btn
+      class="rounded-xl"
+      color="cyan"
+      v-if="_store.allGamesList?.next"
+      @click="_store.setCurrentPageUrl(_store.allGamesList?.next)"
+      >next page</v-btn
+    >
   </v-row>
 </template>
 <script lang="ts" setup>
+import store from "~/store/store";
+
 const router = useRouter();
-const isLoading = ref(false);
-const api_key = useRuntimeConfig().app.apiKey;
-const initialUrl = `https://api.rawg.io/api/games?key=${api_key}`;
-const previousPageUrl = ref(null);
-const nextPageUrl = ref(null);
-const gamesList = ref([]);
-
-const getAllGames = async (url: string) => {
-  try {
-    isLoading.value = true;
-    const data = await $fetch(url);
-    gamesList.value = data?.results;
-
-    nextPageUrl.value = data?.next;
-    previousPageUrl.value = data?.previous;
-  } catch (error: any) {
-    console.log(error.message);
-  } finally {
-    isLoading.value = false;
-  }
-};
+const _store = store();
 
 onMounted(() => {
-  getAllGames(initialUrl);
+  _store.getAllGames(_store.currentPageUrl);
 });
 </script>
+
 <style scoped>
 @import url(/assets/css/main.css);
 
