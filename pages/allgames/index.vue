@@ -99,14 +99,14 @@
 
   <v-row v-if="!_store.isLoading" class="mt-15 flex justify-center align-center ga-3">
     <v-btn
-      class="rounded-xl"
+      class="rounded-xl text-white"
       color="cyan"
       v-if="_store.allGamesList?.previous"
       @click="_store.setCurrentPageUrl(_store.allGamesList?.previous)"
       >prev page</v-btn
     >
     <v-btn
-      class="rounded-xl"
+      class="rounded-xl text-white"
       color="cyan"
       v-if="_store.allGamesList?.next"
       @click="_store.setCurrentPageUrl(_store.allGamesList?.next)"

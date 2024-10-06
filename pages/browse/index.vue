@@ -1,7 +1,7 @@
 <template>
-  <Loading v-if="isLoading" />
+  <Loading v-if="_store.isLoading" />
 
-  <v-row v-if="!isLoading" class="d-flex flex-column mt-10">
+  <v-row v-if="!_store.isLoading" class="d-flex flex-column mt-10">
     <h3 class="text-h5 text-md-h4 text-xl-h3">Popular Genres</h3>
     <hr class="mt-2 mb-10 w-75 w-md-25" color="#0AE6FF" />
     <v-col cols="12">
@@ -48,7 +48,7 @@
         <div class="custom-swiper-button-next pa-5 cursor-pointer">
           <v-icon icon="mdi-arrow-right" size="x-large" color="white" />
         </div>
-        <SwiperSlide class="swiper-slide" v-for="item of genres" :key="item.id">
+        <SwiperSlide class="swiper-slide" v-for="item of _store.genres" :key="item.id">
           <v-img
             class="image transition rounded-xl transition"
             :src="item?.image_background"
@@ -77,11 +77,14 @@
     </v-col>
   </v-row>
 
-  <v-row v-if="!isLoading" class="d-flex justify-center align-center ga-2 ga-sm-5 my-15">
+  <v-row
+    v-if="!_store.isLoading"
+    class="d-flex justify-center align-center ga-2 ga-sm-5 my-15"
+  >
     <v-btn
       class="d-none d-sm-flex transition category-btn"
       @click="getAllGames(item)"
-      :class="activeCategory === item.name ? 'active-category' : ''"
+      :class="_store.activeCategory === item.name ? 'active-category' : ''"
       v-for="(item, index) of categories"
       :key="index"
       variant="outlined"
@@ -102,7 +105,7 @@
     />
   </v-row>
 
-  <v-row v-if="!isLoading">
+  <v-row v-if="!_store.isLoading">
     <v-col
       @click="
         router.push({
@@ -210,7 +213,6 @@ const router = useRouter();
 const _store = store();
 
 const isLoading = ref(false);
-const genres = ref([]);
 const api_key = useRuntimeConfig().app.apiKey;
 const initialCategoryEndPoint = `https://api.rawg.io/api/games?key=${api_key}&ordering=-added_by_status.beaten`;
 const previousPageUrl = ref(null);
@@ -232,25 +234,6 @@ const categories = [
   },
 ];
 const activeCategory = ref(null);
-
-const getGenres = async () => {
-  try {
-    isLoading.value = true;
-    const data = await $fetch(`https://api.rawg.io/api/genres?key=${api_key}`);
-    genres.value = data?.results;
-  } catch (error: any) {
-    console.log(error.message);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const seeGenre = async (genre: any) => {
-  const genreData = await $fetch(
-    `https://api.rawg.io/api/games?key=${api_key}&genres=${genre.slug}`
-  );
-  return genreData;
-};
 
 const getAllGames = async (item: any) => {
   try {
@@ -286,7 +269,7 @@ const formattedDate = () => {
 
 onMounted(async () => {
   await nextTick();
-  getGenres();
+  _store.getGenres();
 });
 </script>
 <style scoped>

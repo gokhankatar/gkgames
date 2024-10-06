@@ -81,7 +81,7 @@
           v-for="store of game?.stores"
           :href="`https://${store.store.domain}`"
           target="_blank"
-          class="store-text d-inline transition text-subtitle-1"
+          class="store-text d-inline transition text-subtitle-2 text-sm-subtitle-1"
         >
           {{ store.store.name }}
         </a>
