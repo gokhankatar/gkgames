@@ -8,9 +8,11 @@ const store = defineStore("piniaStore", {
             isLoading: false,
             api_key: config.app.apiKey,
             currentPageUrl: `https://api.rawg.io/api/games?key=${config.app.apiKey}`,
+            currentPageUrlByCategories: `https://api.rawg.io/api/games?key=${config.app.apiKey}`,
             allGamesList: null,
+            allGamesListByCategory: null,
             genres: null,
-            activeCategory: null
+            activeCategory: null,
         };
     },
     actions: {
@@ -43,6 +45,51 @@ const store = defineStore("piniaStore", {
                 console.log(error.message);
             } finally {
                 this.isLoading = false;
+            }
+        },
+        async getAllGameByCategories(url) {
+            try {
+                this.isLoading = true;
+                const data = await $fetch(this.currentPageUrlByCategories)
+                this.allGamesListByCategory = data;
+            } catch (error) {
+                console.error(error.message)
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        setCurrentPageUrlByCategories(url) {
+            this.currentPageUrlByCategories = url;
+            this.getAllGameByCategories(url);
+        },
+        setComingSoon() {
+            if (this.activeCategory === "coming soon") {
+                this.activeCategory = null;
+                this.getAllGameByCategories(this.currentPageUrl)
+            } else {
+                this.activeCategory = "coming soon";
+                this.currentPageUrlByCategories = `https://api.rawg.io/api/games?key=${this.api_key}&dates=2024-10-05,2025-10-05&ordering=released`;
+                this.getAllGameByCategories(this.currentPageUrlByCategories);
+            }
+        },
+        setRecentlyAdded() {
+            if (this.activeCategory === "recently added") {
+                this.activeCategory = null;
+                this.getAllGameByCategories(this.currentPageUrl)
+            } else {
+                this.activeCategory = "recently added";
+                this.currentPageUrlByCategories = `https://api.rawg.io/api/games?key=${this.api_key}&ordering=-added`;
+                this.getAllGameByCategories(this.currentPageUrlByCategories);
+            }
+        },
+        setTopRated() {
+            if (this.activeCategory === "top rated") {
+                this.activeCategory = null;
+                this.getAllGameByCategories(this.currentPageUrl)
+            } else {
+                this.activeCategory = "top rated";
+                this.currentPageUrlByCategories = `https://api.rawg.io/api/games?key=${this.api_key}&ordering=-metacritic`;
+                this.getAllGameByCategories(this.currentPageUrlByCategories);
             }
         }
     },

@@ -48,7 +48,7 @@
         <div class="custom-swiper-button-next pa-5 cursor-pointer">
           <v-icon icon="mdi-arrow-right" size="x-large" color="white" />
         </div>
-        <SwiperSlide class="swiper-slide" v-for="item of _store.genres" :key="item.id">
+        <SwiperSlide class="swiper-slide" v-for="item of _store.genres" :key="item?.id">
           <v-img
             class="image transition rounded-xl transition"
             :src="item?.image_background"
@@ -61,9 +61,9 @@
           <div
             @click="
               router.push({
-                path: `/browse/${item.name}`,
+                path: `/browse/${item?.name}`,
                 query: {
-                  name: item.name,
+                  name: item?.name,
                   endPoint: `https://api.rawg.io/api/games?key=${api_key}&genres=${item.slug}`,
                 },
               })
@@ -83,23 +83,28 @@
   >
     <v-btn
       class="d-none d-sm-flex transition category-btn"
-      @click="getAllGames(item)"
-      :class="_store.activeCategory === item.name ? 'active-category' : ''"
-      v-for="(item, index) of categories"
-      :key="index"
+      @click="_store.setComingSoon"
+      :class="_store.activeCategory === 'coming soon' ? 'active-category' : ''"
       variant="outlined"
-      :text="item.name"
+      text="coming soon"
       rounded="xl"
       size="x-large"
     />
     <v-btn
-      class="d-flex d-sm-none transition category-btn"
-      @click="getAllGames(item)"
-      :class="activeCategory === item.name ? 'active-category' : ''"
-      v-for="(item, index) of categories"
-      :key="index"
+      class="d-none d-sm-flex transition category-btn"
+      @click="_store.setRecentlyAdded"
+      :class="_store.activeCategory === 'recently added' ? 'active-category' : ''"
       variant="outlined"
-      :text="item.name"
+      text="recently added"
+      rounded="xl"
+      size="x-large"
+    />
+    <v-btn
+      class="d-none d-sm-flex transition category-btn"
+      @click="_store.setTopRated"
+      :class="_store.activeCategory === 'top rated' ? 'active-category' : ''"
+      variant="outlined"
+      text="top rated"
       rounded="xl"
       size="x-large"
     />
@@ -114,7 +119,7 @@
         })
       "
       class="game-wrapper cursor-pointer"
-      v-for="(item, index) of gamesList"
+      v-for="(item, index) of _store.allGamesListByCategory?.results"
       :key="item.id"
       cols="12"
       sm="6"
@@ -127,7 +132,9 @@
         class="image cursor-pointer transition rounded-lg transition"
       />
       <v-icon class="icon d-none pa-5 rounded-xl cursor-pointer" icon="mdi-heart" />
-      <span class="metacritic d-none pa-2 rounded-lg">{{ item?.metacritic }}</span>
+      <span v-if="item.metacritic" class="metacritic d-none pa-2 rounded-lg">{{
+        item?.metacritic
+      }}</span>
       <div class="content-info d-flex flex-column ga-2 rounded-lg pa-3">
         <span class="info-name d-flex text-subtitle-1 text-md-h5">{{ item.name }}</span>
         <div class="d-flex justify-space-between align-center">
@@ -201,9 +208,23 @@
     </v-col>
   </v-row>
 
-  <v-row v-if="!isLoading" class="mt-15 flex justify-center align-center ga-3">
-    <v-btn v-if="previousPageUrl" @click="getAllGames(previousPageUrl)">prev page</v-btn>
-    <v-btn v-if="nextPageUrl" @click="getAllGames(nextPageUrl)">next page</v-btn>
+  <v-row v-if="!_store.isLoading" class="mt-15 flex justify-center align-center ga-3">
+    <v-btn
+      class="rounded-xl text-white"
+      color="cyan"
+      v-if="_store.allGamesListByCategory?.previous"
+      @click="
+        _store.setCurrentPageUrlByCategories(_store.allGamesListByCategory?.previous)
+      "
+      >prev page</v-btn
+    >
+    <v-btn
+      class="rounded-xl text-white"
+      color="cyan"
+      v-if="_store.allGamesListByCategory?.next"
+      @click="_store.setCurrentPageUrlByCategories(_store.allGamesListByCategory?.next)"
+      >next page</v-btn
+    >
   </v-row>
 </template>
 <script lang="ts" setup>
@@ -211,69 +232,52 @@ import store from "~/store/store";
 
 const router = useRouter();
 const _store = store();
-
-const isLoading = ref(false);
 const api_key = useRuntimeConfig().app.apiKey;
-const initialCategoryEndPoint = `https://api.rawg.io/api/games?key=${api_key}&ordering=-added_by_status.beaten`;
-const previousPageUrl = ref(null);
-const nextPageUrl = ref(null);
-const gamesList = ref([]);
-const categories = [
-  {
-    name: "Coming Soon",
-    url: `https://api.rawg.io/api/games?key=${api_key}&dates=2024-10-05,2025-10-05&ordering=released`,
-  },
-  {
-    name: "Recently Added",
-    url: `https://api.rawg.io/api/games?key=${api_key}&ordering=-added
-`,
-  },
-  {
-    name: "Top Rated",
-    url: `https://api.rawg.io/api/games?key=${api_key}&ordering=-rating`,
-  },
-];
-const activeCategory = ref(null);
-
-const getAllGames = async (item: any) => {
-  try {
-    isLoading.value = true;
-    let url;
-    if (activeCategory.value === item.name) {
-      activeCategory.value = null;
-      url = initialCategoryEndPoint;
-    } else {
-      activeCategory.value = item.name;
-      url = item.url;
-    }
-    const data = await $fetch(url);
-    gamesList.value = data?.results;
-
-    nextPageUrl.value = data?.next;
-    previousPageUrl.value = data?.previous;
-  } catch (error: any) {
-    console.log(error.message);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const formattedDate = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-};
 
 onMounted(async () => {
   await nextTick();
   _store.getGenres();
+  _store.getAllGameByCategories(_store.currentPageUrlByCategories);
 });
 </script>
 <style scoped>
 @import url(/assets/css/main.css);
+
+.game-wrapper {
+  position: relative;
+}
+.image {
+  position: relative;
+  overflow: hidden;
+}
+.game-wrapper:hover .image {
+  transform: scale(1.02);
+  filter: brightness(0.5);
+}
+.game-wrapper:hover .icon {
+  display: flex !important;
+}
+.game-wrapper:hover .metacritic {
+  display: flex !important;
+}
+.metacritic {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  background-color: #0ae6ff;
+  color: #fff;
+}
+.icon {
+  position: absolute;
+  top: 5%;
+  right: 5%;
+  background-color: rgba(0, 0, 0, 0.3);
+  color: #fff;
+}
+.icon:hover {
+  background-color: red;
+  color: #fff;
+}
 
 .swiper-slide {
   position: relative;
