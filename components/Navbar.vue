@@ -132,7 +132,6 @@ const searchGame = async () => {
         },
       });
       searchResults.value = data.value?.results;
-      console.log(searchResults.value);
     } else {
       searchResults.value = [];
     }
