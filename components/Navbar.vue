@@ -40,7 +40,8 @@
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         rounded="xl"
-        placeholder="Search Game"
+        label="Search"
+        placeholder="Elden Ring"
       />
       <div class="search-results rounded-lg pa-3">
         <v-progress-circular
@@ -70,7 +71,7 @@
                 </span>
               </div>
               <span class="game-date d-inline text-caption">
-                {{ item?.released.substring(0, 4) }}
+                {{ item?.released?.substring(0, 4) }}
               </span>
             </div>
           </div>
@@ -125,13 +126,13 @@ const searchGame = async () => {
   try {
     if (models.value.name.length > 2) {
       isSmLoading.value = true;
-      const { data } = await useFetch("https://api.rawg.io/api/games", {
+      const data = await $fetch("https://api.rawg.io/api/games", {
         params: {
           key: api_key,
           search: models.value.name,
         },
       });
-      searchResults.value = data.value?.results;
+      searchResults.value = data?.results;
     } else {
       searchResults.value = [];
     }
