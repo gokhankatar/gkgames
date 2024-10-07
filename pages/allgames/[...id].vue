@@ -69,6 +69,7 @@
     </v-col>
 
     <v-col cols="12" md="12" lg="5" class="d-flex flex-column ga-2">
+      <!-- genres -->
       <div class="d-flex justify-start align-center ga-5">
         <span class="text-grey">Genres: </span>
         <span class="d-inline text-subtitle-1">
@@ -76,6 +77,7 @@
         </span>
       </div>
 
+      <!-- release -->
       <div class="d-flex justify-start align-center ga-5">
         <span class="text-grey">Released: </span>
         <span class="d-inline text-subtitle-1">
@@ -83,6 +85,7 @@
         </span>
       </div>
 
+      <!-- metacritic -->
       <div class="d-flex justify-start align-center ga-5">
         <span class="text-grey">Metacritic: </span>
         <span class="d-inline text-subtitle-1">
@@ -91,6 +94,7 @@
         <v-icon icon="mdi-trophy" />
       </div>
 
+      <!-- stores -->
       <div class="d-flex justify-start align-center ga-5">
         <span class="text-grey">Stores: </span>
         <a
@@ -103,6 +107,7 @@
         </a>
       </div>
 
+      <!-- platforms -->
       <div class="d-flex justify-start align-center ga-5">
         <span class="text-grey">Platforms: </span>
         <div class="platforms">
@@ -159,6 +164,7 @@
         </div>
       </div>
 
+      <!-- tags -->
       <div class="mt-5">
         <v-chip class="ma-1" v-for="tag of game.tags" :key="tag.id">{{
           tag.name
@@ -166,14 +172,16 @@
       </div>
     </v-col>
   </v-row>
+
   <v-responsive height="100" />
-  <v-row class="d-flex flex-column justify-start align-start mt-15">
+
+  <v-row v-if="requirements" class="d-flex flex-column justify-start align-start">
     <h3 class="text-h5 text-md-h4">System Requirements</h3>
-    <hr color="#0AE6FF" class="mt-2 mb-10 w-100 w-md-25" />
+    <hr color="#0AE6FF" class="mt-2 w-100 w-md-25" />
   </v-row>
 
-  <v-row v-for="systemReq of game.platforms" class="my-5">
-    <v-col cols="12" sm="6">
+  <v-row v-for="systemReq of game.platforms">
+    <v-col v-if="requirements" cols="12" sm="6">
       <v-card
         height="250"
         v-if="systemReq?.requirements_en?.minimum"
@@ -182,7 +190,7 @@
         <v-card-text v-html="systemReq.requirements_en.minimum"></v-card-text>
       </v-card>
     </v-col>
-    <v-col cols="12" sm="6">
+    <v-col v-if="requirements" cols="12" sm="6">
       <v-card
         height="250"
         v-if="systemReq?.requirements_en?.recommend"
@@ -203,6 +211,7 @@ definePageMeta({
 const router = useRouter();
 const route = useRoute();
 const isLoading = ref(false);
+const requirements = ref(false);
 
 const game = computed(() => {
   const gameData = route.query.game;
@@ -215,9 +224,15 @@ const game = computed(() => {
     isLoading.value = false;
   }
 });
-
+const handleReq = async () => {
+  await game.value.platforms.forEach((g) => {
+    if (g.requirements_en) {
+      requirements.value = true;
+    }
+  });
+};
 onMounted(() => {
-  console.log(game);
+  handleReq();
 });
 </script>
 <style scoped>

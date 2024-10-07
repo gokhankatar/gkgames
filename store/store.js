@@ -4,7 +4,7 @@ const store = defineStore("piniaStore", {
     state() {
         const config = useRuntimeConfig();
         return {
-            theme: null,
+            theme: "light",
             isLoading: false,
             api_key: config.app.apiKey,
             currentPageUrl: `https://api.rawg.io/api/games?key=${config.app.apiKey}`,

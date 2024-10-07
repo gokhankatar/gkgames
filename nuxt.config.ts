@@ -3,7 +3,8 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   runtimeConfig: {
     app: {
-      apiKey: process.env.API_KEY
+      apiKey: process.env.API_KEY,
+      apiKeyNews: process.env.API_KEY_NEWS
     }
   },
   modules: [

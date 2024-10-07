@@ -122,14 +122,14 @@
   </v-row>
   <v-row v-if="!isLoading" class="mt-15 flex justify-center align-center ga-3">
     <v-btn
-      class="rounded-xl text-white"
+      class="actions-btn transition rounded-xl text-white"
       color="cyan"
       v-if="previousPageUrl"
       @click="getAllGamesForPage(previousPageUrl)"
       >prev page</v-btn
     >
     <v-btn
-      class="rounded-xl text-white"
+      class="actions-btn transition rounded-xl text-white"
       color="cyan"
       v-if="nextPageUrl"
       @click="getAllGamesForPage(nextPageUrl)"
@@ -221,6 +221,9 @@ onMounted(async () => {
 }
 
 .back-btn:hover {
+  color: #000 !important;
+}
+.actions-btn:hover {
   color: #000 !important;
 }
 </style>

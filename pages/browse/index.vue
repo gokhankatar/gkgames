@@ -2,7 +2,9 @@
   <Loading v-if="_store.isLoading" />
 
   <v-row v-if="!_store.isLoading" class="d-flex flex-column mt-10">
-    <h3 class="text-h5 text-md-h4 text-xl-h3 text-center text-sm-start">Popular Genres</h3>
+    <h3 class="text-h5 text-md-h4 text-xl-h3 text-center text-sm-start">
+      Popular Genres
+    </h3>
     <hr class="mt-2 mb-10 w-50 w-md-25 mx-auto mx-sm-0" color="#0AE6FF" />
     <v-col cols="12">
       <swiper
@@ -234,9 +236,12 @@
     </v-col>
   </v-row>
 
-  <v-row v-if="!_store.isLoading" class="mt-15 mb-5 flex justify-center align-center ga-3">
+  <v-row
+    v-if="!_store.isLoading"
+    class="mt-15 mb-5 flex justify-center align-center ga-3"
+  >
     <v-btn
-      class="rounded-xl text-white"
+      class="actions-btn transition rounded-xl text-white"
       color="cyan"
       v-if="_store.allGamesListByCategory?.previous"
       @click="
@@ -245,7 +250,7 @@
       >prev page</v-btn
     >
     <v-btn
-      class="rounded-xl text-white"
+      class="actions-btn transition rounded-xl text-white"
       color="cyan"
       v-if="_store.allGamesListByCategory?.next"
       @click="_store.setCurrentPageUrlByCategories(_store.allGamesListByCategory?.next)"
@@ -363,6 +368,9 @@ onMounted(async () => {
 }
 .active-category:hover {
   border-color: #0ae6ff !important;
+  color: #000 !important;
+}
+.actions-btn:hover {
   color: #000 !important;
 }
 </style>

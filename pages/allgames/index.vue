@@ -102,14 +102,14 @@
     class="mt-15 mb-5 flex justify-center align-center ga-3"
   >
     <v-btn
-      class="rounded-xl text-white"
+      class="actions-btn transition rounded-xl text-white"
       color="cyan"
       v-if="_store.allGamesList?.previous"
       @click="_store.setCurrentPageUrl(_store.allGamesList?.previous)"
       >prev page</v-btn
     >
     <v-btn
-      class="rounded-xl text-white"
+      class="actions-btn transition rounded-xl text-white"
       color="cyan"
       v-if="_store.allGamesList?.next"
       @click="_store.setCurrentPageUrl(_store.allGamesList?.next)"
@@ -165,5 +165,8 @@ onMounted(() => {
 .icon:hover {
   background-color: red;
   color: #fff;
+}
+.actions-btn:hover {
+  color: #000 !important;
 }
 </style>
