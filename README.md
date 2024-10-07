@@ -1,1 +1,1 @@
-
+# search kısmını mobile için düzelt
