@@ -97,7 +97,10 @@
     </v-col>
   </v-row>
 
-  <v-row v-if="!_store.isLoading" class="mt-15 flex justify-center align-center ga-3">
+  <v-row
+    v-if="!_store.isLoading"
+    class="mt-15 mb-5 flex justify-center align-center ga-3"
+  >
     <v-btn
       class="rounded-xl text-white"
       color="cyan"

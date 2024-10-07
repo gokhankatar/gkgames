@@ -1,14 +1,28 @@
 <template>
   <Loading v-if="isLoading" />
-  <v-row class="d-flex justify-space-between align-center" v-if="!isLoading">
+  <v-row
+    class="d-flex justify-space-between align-start mt-2 mt-sm-0 pa-3"
+    v-if="!isLoading"
+  >
     <div class="content">
-      <h3 class="text-h5 text-lg-h2">{{ route.query.name }} Games</h3>
-      <hr class="mt-2 mb-10 w-75 w-md-100" color="#0AE6FF" />
+      <h3 class="text-subtitle-1 text-lg-h3">{{ route.query.name }} Games</h3>
+      <hr class="mt-2 mb-10 w-100" color="#0AE6FF" />
     </div>
     <v-btn
+      class="back-btn d-none d-sm-flex rounded-lg transition text-white"
+      color="cyan"
+      size="x-large"
       @click="router.replace('/browse')"
       prepend-icon="mdi-arrow-left"
-      text="Back to Browse"
+      text="Back"
+    />
+    <v-btn
+      class="back-btn d-flex d-sm-none rounded-lg transition text-white"
+      color="cyan"
+      @click="router.replace('/browse')"
+      prepend-icon="mdi-arrow-left"
+      text="Back"
+      size="small"
     />
   </v-row>
   <v-row v-if="!isLoading">
@@ -107,12 +121,23 @@
     </v-col>
   </v-row>
   <v-row v-if="!isLoading" class="mt-15 flex justify-center align-center ga-3">
-    <v-btn v-if="previousPageUrl" @click="getAllGamesForPage(previousPageUrl)"
+    <v-btn
+      class="rounded-xl text-white"
+      color="cyan"
+      v-if="previousPageUrl"
+      @click="getAllGamesForPage(previousPageUrl)"
       >prev page</v-btn
     >
-    <v-btn v-if="nextPageUrl" @click="getAllGamesForPage(nextPageUrl)">next page</v-btn>
+    <v-btn
+      class="rounded-xl text-white"
+      color="cyan"
+      v-if="nextPageUrl"
+      @click="getAllGamesForPage(nextPageUrl)"
+      >next page</v-btn
+    >
   </v-row>
 </template>
+
 <script lang="ts" setup>
 definePageMeta({
   layout: "single-game",
@@ -155,6 +180,7 @@ onMounted(async () => {
   getGenres();
 });
 </script>
+
 <style scoped>
 @import url(/assets/css/main.css);
 
@@ -192,5 +218,9 @@ onMounted(async () => {
 .icon:hover {
   background-color: red;
   color: #fff;
+}
+
+.back-btn:hover {
+  color: #000 !important;
 }
 </style>

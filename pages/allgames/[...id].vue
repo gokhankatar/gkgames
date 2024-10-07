@@ -1,10 +1,28 @@
 <template>
   <Loading v-if="isLoading" />
-  <v-row v-if="!isLoading">
+  <v-row
+    v-if="!isLoading"
+    class="d-flex justify-space-between align-start mt-2 mt-sm-0 pa-3"
+  >
+    <div class="content-title">
+      <h3 class="text-subtitle-1 font-weight-bold text-lg-h3">{{ game.name }}</h3>
+      <hr class="mt-2 mb-10 w-100" color="#0AE6FF" />
+    </div>
     <v-btn
+      class="back-btn d-none d-sm-flex rounded-lg transition text-white"
+      color="cyan"
+      size="x-large"
       @click="router.replace('/allgames')"
       prepend-icon="mdi-arrow-left"
-      text="Back to All Games"
+      text="Back"
+    />
+    <v-btn
+      class="back-btn d-flex d-sm-none rounded-lg transition text-white"
+      color="cyan"
+      @click="router.replace('/allgames')"
+      prepend-icon="mdi-arrow-left"
+      text="Back"
+      size="small"
     />
   </v-row>
   <v-row v-if="!isLoading">
@@ -51,8 +69,6 @@
     </v-col>
 
     <v-col cols="12" md="12" lg="5" class="d-flex flex-column ga-2">
-      <h3 class="text-h5 text-md-h3">{{ game.name }}</h3>
-
       <div class="d-flex justify-start align-center ga-5">
         <span class="text-grey">Genres: </span>
         <span class="d-inline text-subtitle-1">
@@ -253,5 +269,8 @@ onMounted(() => {
 .store-text:hover {
   color: #0ae6ff;
   text-decoration: underline;
+}
+.back-btn:hover {
+  color: #000 !important;
 }
 </style>

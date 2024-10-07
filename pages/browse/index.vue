@@ -2,8 +2,8 @@
   <Loading v-if="_store.isLoading" />
 
   <v-row v-if="!_store.isLoading" class="d-flex flex-column mt-10">
-    <h3 class="text-h5 text-md-h4 text-xl-h3">Popular Genres</h3>
-    <hr class="mt-2 mb-10 w-75 w-md-25" color="#0AE6FF" />
+    <h3 class="text-h5 text-md-h4 text-xl-h3 text-center text-sm-start">Popular Genres</h3>
+    <hr class="mt-2 mb-10 w-50 w-md-25 mx-auto mx-sm-0" color="#0AE6FF" />
     <v-col cols="12">
       <swiper
         :modules="[SwiperFreeMode, SwiperAutoplay, SwiperNavigation]"
@@ -91,6 +91,15 @@
       size="x-large"
     />
     <v-btn
+      class="d-flex d-sm-none transition category-btn"
+      @click="_store.setComingSoon"
+      :class="_store.activeCategory === 'coming soon' ? 'active-category' : ''"
+      variant="outlined"
+      text="coming soon"
+      rounded="xl"
+    />
+
+    <v-btn
       class="d-none d-sm-flex transition category-btn"
       @click="_store.setRecentlyAdded"
       :class="_store.activeCategory === 'recently added' ? 'active-category' : ''"
@@ -100,6 +109,15 @@
       size="x-large"
     />
     <v-btn
+      class="d-flex d-sm-none transition category-btn"
+      @click="_store.setRecentlyAdded"
+      :class="_store.activeCategory === 'recently added' ? 'active-category' : ''"
+      variant="outlined"
+      text="recently added"
+      rounded="xl"
+    />
+
+    <v-btn
       class="d-none d-sm-flex transition category-btn"
       @click="_store.setTopRated"
       :class="_store.activeCategory === 'top rated' ? 'active-category' : ''"
@@ -107,6 +125,14 @@
       text="top rated"
       rounded="xl"
       size="x-large"
+    />
+    <v-btn
+      class="d-flex d-sm-none transition category-btn"
+      @click="_store.setTopRated"
+      :class="_store.activeCategory === 'top rated' ? 'active-category' : ''"
+      variant="outlined"
+      text="top rated"
+      rounded="xl"
     />
   </v-row>
 
@@ -208,7 +234,7 @@
     </v-col>
   </v-row>
 
-  <v-row v-if="!_store.isLoading" class="mt-15 flex justify-center align-center ga-3">
+  <v-row v-if="!_store.isLoading" class="mt-15 mb-5 flex justify-center align-center ga-3">
     <v-btn
       class="rounded-xl text-white"
       color="cyan"
@@ -334,5 +360,9 @@ onMounted(async () => {
   background-color: #0ae6ff !important;
   border-color: #0ae6ff !important;
   color: #fff !important;
+}
+.active-category:hover {
+  border-color: #0ae6ff !important;
+  color: #000 !important;
 }
 </style>
