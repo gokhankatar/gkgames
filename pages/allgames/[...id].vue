@@ -81,7 +81,7 @@
       <div class="d-flex justify-start align-center ga-5">
         <span class="text-grey">Released: </span>
         <span class="d-inline text-subtitle-1">
-          {{ game?.released.substring(0, 4) }}
+          {{ game?.released?.substring(0, 4) }}
         </span>
       </div>
 

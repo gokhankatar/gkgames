@@ -174,7 +174,7 @@
         <div class="d-flex justify-space-between align-center">
           <span class="text-grey">Released: </span>
           <span class="d-inline text-caption">
-            {{ item?.released.substring(0, 4) }}
+            {{ item?.released?.substring(0, 4) }}
           </span>
         </div>
         <div class="d-flex justify-space-between align-center">
