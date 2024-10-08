@@ -60,13 +60,18 @@
             @click="openGame(item)"
             v-for="item of searchResults"
             :key="item?.id"
-            class="game text-white rounded-lg pa-2 pa-md-5 cursor-pointer transition d-flex justify-start align-center ga-2"
+            class="game text-white rounded-lg pa-1 pa-md-5 cursor-pointer transition d-flex justify-start align-center ga-2"
           >
             <img class="rounded-lg game-image" :src="item?.background_image" cover />
             <div class="context d-flex flex-column">
-              <span class="game-title text-subtitle-1">{{ item.name }}</span>
-              <div class="d-flex">
-                <span class="game-genre text-subtitle-2" v-for="genre of item?.genres">
+              <span class="game-title text-subtitle-2 text-md-subtitle-1">{{
+                item.name
+              }}</span>
+              <div class="d-flex flex-wrap">
+                <span
+                  class="game-genre text-caption text-md-subtitle-2"
+                  v-for="genre of item?.genres"
+                >
                   {{ genre.name + " " }}&nbsp;
                 </span>
               </div>

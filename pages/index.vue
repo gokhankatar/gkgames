@@ -34,11 +34,11 @@
         }"
         class="mySwiper"
       >
-        <div class="custom-swiper-button-prev pa-5 cursor-pointer">
+        <div class="custom-swiper-button-prev pa-5 transition cursor-pointer">
           <v-icon icon="mdi-arrow-left d-none d-sm-flex" size="x-large" color="white" />
           <v-icon icon="mdi-arrow-left d-flex d-sm-none" color="white" />
         </div>
-        <div class="custom-swiper-button-next pa-5 cursor-pointer">
+        <div class="custom-swiper-button-next transition pa-5 cursor-pointer">
           <v-icon icon="mdi-arrow-right d-none d-sm-flex" size="x-large" color="white" />
           <v-icon icon="mdi-arrow-right d-flex d-sm-none" color="white" />
         </div>
@@ -192,5 +192,11 @@ onMounted(async () => {
 }
 .custom-swiper-button-next {
   right: 1%;
+}
+.custom-swiper-button-prev:hover {
+  background-color: rgba(0, 204, 255, 0.5);
+}
+.custom-swiper-button-next:hover {
+  background-color: rgba(0, 204, 255, 0.5);
 }
 </style>

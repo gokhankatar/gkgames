@@ -1,3 +1,9 @@
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #272C34 #121212;
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: "Inter", sans-serif;
     font-weight: 500;

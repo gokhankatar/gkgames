@@ -15,3 +15,7 @@ const _store = store();
     </v-main>
   </v-app>
 </template>
+
+<style>
+@import url(/assets/css/main.css);
+</style>
