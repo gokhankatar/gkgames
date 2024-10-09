@@ -1,1 +1,4 @@
-# search kısmını mobile için düzelt
+## macbook icin ekranı ayarla
+## title ve seoları ekle
+
+# backend kısmına geç
