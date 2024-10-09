@@ -1,6 +1,7 @@
 <template>
   <Loading v-if="isLoading" />
 
+  <!-- game news slider -->
   <v-row v-if="!isLoading" class="my-5">
     <v-col cols="12">
       <swiper
@@ -29,7 +30,7 @@
         :loop="true"
         :space-between="10"
         :autoplay="{
-          delay: 3000,
+          delay: 4500,
           disableOnInteraction: false,
         }"
         class="mySwiper"
@@ -44,23 +45,13 @@
         </div>
         <swiper-slide v-for="item of randomNews" class="swiper-slide rounded-lg">
           <v-img
-            class="image rounded-lg d-none d-md-flex"
+            class="image rounded-lg"
             :src="
               item.urlToImage
                 ? item.urlToImage
                 : 'https://media.istockphoto.com/id/1334436084/tr/foto%C4%9Fraf/top-down-view-of-colorful-illuminated-gaming-accessories-laying-on-table.jpg?s=612x612&w=0&k=20&c=RefVtIFV7L-nNysTPo3JulhNcw2eAmm6sF0kARa6D9o='
             "
-            height="700"
-            cover
-          />
-          <v-img
-            class="image rounded-lg d-flex d-md-none"
-            :src="
-              item.urlToImage
-                ? item.urlToImage
-                : 'https://media.istockphoto.com/id/1334436084/tr/foto%C4%9Fraf/top-down-view-of-colorful-illuminated-gaming-accessories-laying-on-table.jpg?s=612x612&w=0&k=20&c=RefVtIFV7L-nNysTPo3JulhNcw2eAmm6sF0kARa6D9o='
-            "
-            height="500"
+            height="70vh"
             cover
           />
           <div
@@ -100,20 +91,292 @@
       </swiper>
     </v-col>
   </v-row>
+
+  <!-- new games slider -->
+  <v-row v-if="!isLoading" class="mt-15">
+    <v-col cols="12" class="d-flex justify-space-between align-center">
+      <div class="content-wrapper d-flex justify-center align-center ga-2 cursor-pointer">
+        <h3 class="font-weight-bold text-subtitle-1 text-sm-h5">Discover New Games</h3>
+        <v-icon
+          class="right-icon d-none d-sm-flex transition-lg"
+          icon="mdi-chevron-right"
+          size="large"
+        />
+        <v-icon
+          class="right-icon d-flex d-sm-none transition-lg"
+          icon="mdi-chevron-right"
+        />
+      </div>
+
+      <div class="actions-swiper d-flex justify-center align-center ga-2">
+        <div class="newGames-swiper-button-prev pa-2 transition cursor-pointer">
+          <v-icon icon="mdi-chevron-left" size="x-large" color="white" />
+        </div>
+        <div class="newGames-swiper-button-next pa-2 transition cursor-pointer">
+          <v-icon icon="mdi-chevron-right" size="x-large" color="white" />
+        </div>
+      </div>
+    </v-col>
+
+    <v-col cols="12">
+      <swiper
+        :modules="[SwiperFreeMode, SwiperAutoplay, SwiperNavigation]"
+        :freeMode="true"
+        :grab-cursor="true"
+        :navigation="{
+          prevEl: '.newGames-swiper-button-prev',
+          nextEl: '.newGames-swiper-button-next',
+        }"
+        :loop="true"
+        :autoplay="{
+          delay: 3250,
+          disableOnInteraction: false,
+        }"
+        :breakpoints="{
+          '@0.00': {
+            slidesPerView: 1,
+            spaceBetween: 10,
+          },
+          '@0.75': {
+            slidesPerView: 2,
+            spaceBetween: 10,
+          },
+          '@1.00': {
+            slidesPerView: 3,
+            spaceBetween: 20,
+          },
+          1280: {
+            slidesPerView: 4,
+            spaceBetween: 30,
+          },
+          '@1.50': {
+            slidesPerView: 5,
+            spaceBetween: 40,
+          },
+        }"
+        class="mySwiper"
+      >
+        <SwiperSlide
+          class="swiper-slide game-wrapper"
+          v-for="item of newGames"
+          :key="item?.id"
+          @click="
+            router.push({
+              path: `/allgames/${item.name}`,
+              query: { game: JSON.stringify(item) },
+            })
+          "
+        >
+          <v-img
+            class="image-game transition rounded-xl transition cursor-pointer"
+            :src="item?.background_image"
+            height="350"
+            cover
+          />
+          <div class="content-game pa-3 rounded-lg">
+            <h3 class="text-subtitle-2 text-white text-xl-subtitle-1">{{ item.name }}</h3>
+          </div>
+        </SwiperSlide>
+      </swiper>
+    </v-col>
+  </v-row>
+
+  <!-- best games slider -->
+  <v-row v-if="!isLoading" class="mt-15">
+    <v-col cols="12" class="d-flex justify-space-between align-center">
+      <div class="content-wrapper d-flex justify-center align-center ga-2 cursor-pointer">
+        <h3 class="font-weight-bold text-subtitle-1 text-sm-h5">Best Games</h3>
+        <v-icon
+          class="right-icon d-none d-sm-flex transition-lg"
+          icon="mdi-chevron-right"
+          size="large"
+        />
+        <v-icon
+          class="right-icon d-flex d-sm-none transition-lg"
+          icon="mdi-chevron-right"
+        />
+      </div>
+
+      <div class="actions-swiper d-flex justify-center align-center ga-2">
+        <div class="bestGames-swiper-button-prev pa-2 transition cursor-pointer">
+          <v-icon icon="mdi-chevron-left" size="x-large" color="white" />
+        </div>
+        <div class="bestGames-swiper-button-next pa-2 transition cursor-pointer">
+          <v-icon icon="mdi-chevron-right" size="x-large" color="white" />
+        </div>
+      </div>
+    </v-col>
+
+    <v-col cols="12">
+      <swiper
+        :modules="[SwiperFreeMode, SwiperAutoplay, SwiperNavigation]"
+        :freeMode="true"
+        :grab-cursor="true"
+        :navigation="{
+          prevEl: '.bestGames-swiper-button-prev',
+          nextEl: '.bestGames-swiper-button-next',
+        }"
+        :loop="true"
+        :autoplay="{
+          delay: 3850,
+          disableOnInteraction: false,
+        }"
+        :breakpoints="{
+          '@0.00': {
+            slidesPerView: 1,
+            spaceBetween: 10,
+          },
+          '@0.75': {
+            slidesPerView: 2,
+            spaceBetween: 10,
+          },
+          '@1.00': {
+            slidesPerView: 3,
+            spaceBetween: 20,
+          },
+          1280: {
+            slidesPerView: 4,
+            spaceBetween: 30,
+          },
+          '@1.50': {
+            slidesPerView: 5,
+            spaceBetween: 40,
+          },
+        }"
+        class="mySwiper"
+      >
+        <SwiperSlide
+          @click="
+            router.push({
+              path: `/allgames/${item.name}`,
+              query: { game: JSON.stringify(item) },
+            })
+          "
+          class="swiper-slide game-wrapper"
+          v-for="item of bestGamesArr"
+          :key="item?.id"
+        >
+          <v-img
+            class="image-game transition rounded-xl transition cursor-pointer"
+            :src="item?.background_image"
+            height="350"
+            cover
+          />
+          <div class="content-game pa-3 rounded-lg">
+            <h3 class="text-subtitle-2 text-white text-xl-subtitle-1">{{ item.name }}</h3>
+          </div>
+        </SwiperSlide>
+      </swiper>
+    </v-col>
+  </v-row>
+
+  <!-- popular games slider -->
+  <v-row v-if="!isLoading" class="mt-15">
+    <v-col cols="12" class="d-flex justify-space-between align-center">
+      <div class="content-wrapper d-flex justify-center align-center ga-2 cursor-pointer">
+        <h3 class="font-weight-bold text-subtitle-1 text-sm-h5">Popular Games</h3>
+        <v-icon
+          class="right-icon d-none d-sm-flex transition-lg"
+          icon="mdi-chevron-right"
+          size="large"
+        />
+        <v-icon
+          class="right-icon d-flex d-sm-none transition-lg"
+          icon="mdi-chevron-right"
+        />
+      </div>
+
+      <div class="actions-swiper d-flex justify-center align-center ga-2">
+        <div class="popularGames-swiper-button-prev pa-2 transition cursor-pointer">
+          <v-icon icon="mdi-chevron-left" size="x-large" color="white" />
+        </div>
+        <div class="popularGames-swiper-button-next pa-2 transition cursor-pointer">
+          <v-icon icon="mdi-chevron-right" size="x-large" color="white" />
+        </div>
+      </div>
+    </v-col>
+
+    <v-col cols="12">
+      <swiper
+        :modules="[SwiperFreeMode, SwiperAutoplay, SwiperNavigation]"
+        :freeMode="true"
+        :grab-cursor="true"
+        :navigation="{
+          prevEl: '.popularGames-swiper-button-prev',
+          nextEl: '.popularGames-swiper-button-next',
+        }"
+        :loop="true"
+        :autoplay="{
+          delay: 3500,
+          disableOnInteraction: false,
+        }"
+        :breakpoints="{
+          '@0.00': {
+            slidesPerView: 1,
+            spaceBetween: 10,
+          },
+          '@0.75': {
+            slidesPerView: 2,
+            spaceBetween: 10,
+          },
+          '@1.00': {
+            slidesPerView: 3,
+            spaceBetween: 20,
+          },
+          1280: {
+            slidesPerView: 4,
+            spaceBetween: 30,
+          },
+          '@1.50': {
+            slidesPerView: 5,
+            spaceBetween: 40,
+          },
+        }"
+        class="mySwiper"
+      >
+        <SwiperSlide
+          @click="
+            router.push({
+              path: `/allgames/${item.name}`,
+              query: { game: JSON.stringify(item) },
+            })
+          "
+          class="swiper-slide game-wrapper"
+          v-for="item of popularGamesArr"
+          :key="item?.id"
+        >
+          <v-img
+            class="image-game transition rounded-xl transition cursor-pointer"
+            :src="item?.background_image"
+            height="350"
+            cover
+          />
+          <div class="content-game pa-3 rounded-lg">
+            <h3 class="text-subtitle-2 text-white text-xl-subtitle-1">{{ item.name }}</h3>
+          </div>
+        </SwiperSlide>
+      </swiper>
+    </v-col>
+  </v-row>
 </template>
 
 <script lang="ts" setup>
-import { Mousewheel, Keyboard } from "swiper/modules";
+import { Mousewheel } from "swiper/modules";
 
 const isLoading = ref(false);
-const newsArr = ref([]);
-const randomNews = ref([]);
+const router = useRouter();
+const newsArr = ref<any[]>([]);
+const bestGamesArr = ref<any[]>([]);
+const popularGamesArr = ref<any[]>([]);
+const randomNews = ref<any[]>([]);
+const newGames = ref<any[]>([]);
 const api_key = useRuntimeConfig().app.apiKeyNews;
+const apiKey = useRuntimeConfig().app.apiKey;
 
-const selectRandomNews = () => {
-  if (newsArr.value.length > 0) {
-    const shuffled = newsArr.value.sort(() => 0.5 - Math.random());
-    randomNews.value = shuffled.slice(0, 10);
+const selectRandomNews = (list: Ref<any[]>, num: number) => {
+  if (list.value.length > 0) {
+    const shuffled = list.value.sort(() => 0.5 - Math.random());
+    randomNews.value = shuffled.slice(0, num);
   }
 };
 
@@ -123,10 +386,9 @@ const getNews = async () => {
     const data = await $fetch(
       `https://newsapi.org/v2/everything?q=gaming&apiKey=${api_key}`
     );
-    newsArr.value = data?.articles;
+    newsArr.value = data?.articles ?? [];
 
-    selectRandomNews();
-    console.log(randomNews.value);
+    selectRandomNews(newsArr, 10);
   } catch (error: any) {
     console.log(error.message);
   } finally {
@@ -134,9 +396,46 @@ const getNews = async () => {
   }
 };
 
-const openToNews = (item) => {
+const openToNews = (item: any) => {
   const url = item.url;
   window.open(url, "_blank");
+};
+
+const getNewGames = async () => {
+  try {
+    isLoading.value = true;
+    const url = `https://api.rawg.io/api/games?key=${apiKey}&dates=2024-10-05,2025-10-05&ordering=released`;
+    const data = await $fetch(url);
+    newGames.value = data?.results;
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    isLoading.value = false;
+  }
+};
+const getBestGames = async () => {
+  try {
+    isLoading.value = true;
+    const url = `https://api.rawg.io/api/games?key=${apiKey}&ordering=-metacritic`;
+    const data = await $fetch(url);
+    bestGamesArr.value = data?.results;
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    isLoading.value = false;
+  }
+};
+const getPopularGames = async () => {
+  try {
+    isLoading.value = true;
+    const url = `https://api.rawg.io/api/games?ordering=-added&key=${apiKey}`;
+    const data = await $fetch(url);
+    popularGamesArr.value = data?.results;
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 const truncateText = (text: string, length: number) => {
@@ -149,6 +448,9 @@ const truncateText = (text: string, length: number) => {
 onMounted(async () => {
   await nextTick();
   getNews();
+  getNewGames();
+  getBestGames();
+  getPopularGames();
 });
 </script>
 
@@ -167,6 +469,13 @@ onMounted(async () => {
   filter: brightness(0.5);
 }
 .content {
+  position: absolute;
+  bottom: 5%;
+  left: 3%;
+  z-index: 99;
+}
+.content-game {
+  background: rgba(0, 162, 255, 0.3);
   position: absolute;
   bottom: 5%;
   left: 3%;
@@ -198,5 +507,39 @@ onMounted(async () => {
 }
 .custom-swiper-button-next:hover {
   background-color: rgba(0, 204, 255, 0.5);
+}
+.newGames-swiper-button-prev,
+.newGames-swiper-button-next,
+.bestGames-swiper-button-prev,
+.bestGames-swiper-button-next,
+.popularGames-swiper-button-prev,
+.popularGames-swiper-button-next {
+  border-radius: 50%;
+  background-color: rgba(0, 204, 255, 0.3);
+}
+.newGames-swiper-button-prev:hover {
+  background-color: rgba(0, 204, 255, 0.7);
+}
+.newGames-swiper-button-next:hover {
+  background-color: rgba(0, 204, 255, 0.7);
+}
+.bestGames-swiper-button-prev:hover {
+  background-color: rgba(0, 204, 255, 0.7);
+}
+.bestGames-swiper-button-next:hover {
+  background-color: rgba(0, 204, 255, 0.7);
+}
+.popularGames-swiper-button-prev:hover {
+  background-color: rgba(0, 204, 255, 0.7);
+}
+.popularGames-swiper-button-next:hover {
+  background-color: rgba(0, 204, 255, 0.7);
+}
+.content-wrapper:hover .right-icon {
+  margin-left: 0.5rem;
+}
+.game-wrapper:hover .image-game {
+  transform: scale(1.02);
+  filter: brightness(0.5);
 }
 </style>

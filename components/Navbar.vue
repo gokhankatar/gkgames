@@ -1,6 +1,7 @@
 <template>
   <v-app-bar
-    class="navbar-top bg-transparent px-3 py-2 px-sm-6 px-md-9 px-lg-12 px-xl-15"
+    :class="isScrolledToBottom ? 'scrolled' : ''"
+    class="transition-lg bg-transparent px-3 py-2 px-sm-6 px-md-9 px-lg-12 px-xl-15"
     elevation="10"
   >
     <template v-slot:prepend>
@@ -9,7 +10,11 @@
         class="logo cursor-pointer d-flex justify-center align-center ga-2"
       >
         <v-img :src="logo" width="50"></v-img>
-        <span class="text-h5 text-md-h4 d-none d-sm-flex"><strong>GK</strong>Games</span>
+        <span
+          :class="isScrolledToBottom ? 'text-black' : ''"
+          class="text-h5 text-md-h4 d-none d-sm-flex"
+          ><strong>GK</strong>Games</span
+        >
       </div>
       <div></div>
     </template>
@@ -17,7 +22,7 @@
       <div class="actions d-flex justify-center align-center ga-2 ga-sm-4">
         <v-icon
           @click="_store.changeTheme"
-          class="transition theme-icon mx-0 mx-sm-3"
+          class="transition theme-icon mx-0 mx-sm-3 pa-5 rounded-xl"
           size="large"
           :icon="_store.theme === 'light' ? 'mdi-weather-night' : 'mdi-weather-sunny'"
         />
@@ -125,6 +130,7 @@ const models = ref({
   name: "",
 });
 const isSmLoading = ref(false);
+const isScrolledToBottom = ref(false);
 const api_key = useRuntimeConfig().app.apiKey;
 
 const searchGame = async () => {
@@ -157,10 +163,25 @@ const openGame = (item: any) => {
   searchResults.value = [];
   models.value.name = "";
 };
+
+onMounted(() => {
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 0) {
+      isScrolledToBottom.value = true;
+    } else {
+      isScrolledToBottom.value = false;
+    }
+  });
+});
 </script>
 
 <style scoped>
 @import url(/assets/css/main.css);
+
+.scrolled {
+  background-color: #fff !important;
+}
+
 .form {
   position: relative;
 }
@@ -216,6 +237,9 @@ const openGame = (item: any) => {
 .signup-btn:hover {
   background-color: #00e5ff;
   color: #fff;
+}
+.theme-icon {
+  background-color: rgba(0, 0, 0, 0.5) !important;
 }
 .theme-icon:hover {
   color: #00e5ff;
