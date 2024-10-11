@@ -43,17 +43,28 @@
         class="mySwiper"
       >
         <div
-          class="custom-swiper-button-prev rounded-lg d-none pa-2 pa-md-5 cursor-pointer"
+          class="custom-swiper-button-prev rounded-lg d-none pa-1 pa-md-5 cursor-pointer"
         >
           <v-icon icon="mdi-arrow-left" size="x-large" />
         </div>
         <div
-          class="custom-swiper-button-next rounded-lg d-none pa-2 pa-md-5 cursor-pointer"
+          class="custom-swiper-button-next rounded-lg d-none pa-1 pa-md-5 cursor-pointer"
         >
           <v-icon icon="mdi-arrow-right" size="x-large" />
         </div>
         <swiper-slide class="mySwiper" v-for="slide of game.short_screenshots">
-          <v-img class="rounded-lg" :src="slide.image" cover />
+          <v-img
+            height="50vh"
+            class="d-none d-sm-flex rounded-lg"
+            :src="slide.image"
+            cover
+          />
+          <v-img
+            height="40vh"
+            class="d-flex d-sm-none rounded-lg"
+            :src="slide.image"
+            cover
+          />
         </swiper-slide>
       </swiper>
       <swiper
@@ -61,9 +72,21 @@
         :freeMode="true"
         :watchSlidesProgress="true"
         :modules="[SwiperFreeMode, SwiperNavigation, SwiperThumbs]"
+        :space-between="5"
       >
         <swiper-slide class="mySwiper2" v-for="slide of game.short_screenshots">
-          <v-img class="rounded-lg" :src="slide.image" cover />
+          <v-img
+            height="150"
+            class="d-none d-sm-flex rounded-lg"
+            :src="slide.image"
+            cover
+          />
+          <v-img
+            height="100"
+            class="d-flex d-sm-none rounded-lg"
+            :src="slide.image"
+            cover
+          />
         </swiper-slide>
       </swiper>
     </v-col>

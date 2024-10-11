@@ -52,7 +52,19 @@
         </div>
         <SwiperSlide class="swiper-slide" v-for="item of _store.genres" :key="item?.id">
           <v-img
-            class="image transition rounded-xl transition"
+            class="image transition rounded-xl transition d-flex d-sm-none"
+            :src="item?.image_background"
+            height="300"
+            cover
+          />
+          <v-img
+            class="image transition rounded-xl transition d-none d-lg-flex d-xl-none"
+            :src="item?.image_background"
+            height="350"
+            cover
+          />
+          <v-img
+            class="image transition rounded-xl transition d-none d-xl-flex"
             :src="item?.image_background"
             height="450"
             cover
@@ -154,10 +166,22 @@
       lg="3"
     >
       <img
-        height="320"
+        height="250"
         width="100%"
         :src="item.background_image"
-        class="image cursor-pointer transition rounded-lg transition"
+        class="image cursor-pointer transition rounded-lg transition d-flex d-lg-none"
+      />
+      <img
+        height="275"
+        width="100%"
+        :src="item.background_image"
+        class="image cursor-pointer transition rounded-lg transition d-none d-lg-flex d-xl-none"
+      />
+      <img
+        height="350"
+        width="100%"
+        :src="item.background_image"
+        class="image cursor-pointer transition rounded-lg transition d-none d-xl-flex"
       />
       <v-icon class="icon d-none pa-5 rounded-xl cursor-pointer" icon="mdi-heart" />
       <span v-if="item.metacritic" class="metacritic d-none pa-2 rounded-lg">{{

@@ -17,10 +17,22 @@
       lg="3"
     >
       <img
-        height="320"
+        height="250"
         width="100%"
         :src="item.background_image"
-        class="image cursor-pointer transition rounded-lg transition"
+        class="image d-flex d-lg-none cursor-pointer transition rounded-lg transition"
+      />
+      <img
+        height="275"
+        width="100%"
+        :src="item.background_image"
+        class="image d-none d-lg-flex d-xl-none cursor-pointer transition rounded-lg transition"
+      />
+      <img
+        height="350"
+        width="100%"
+        :src="item.background_image"
+        class="image d-none d-xl-flex cursor-pointer transition rounded-lg transition"
       />
       <v-icon class="icon d-none pa-5 rounded-xl cursor-pointer" icon="mdi-heart" />
       <span class="metacritic d-none pa-2 rounded-lg">{{ item?.metacritic }}</span>
