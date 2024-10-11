@@ -41,10 +41,22 @@
       lg="3"
     >
       <img
-        height="320"
+        height="250"
         width="100%"
         :src="item.background_image"
-        class="image cursor-pointer transition rounded-lg transition"
+        class="image cursor-pointer transition rounded-lg transition d-flex d-lg-none"
+      />
+      <img
+        height="275"
+        width="100%"
+        :src="item.background_image"
+        class="image cursor-pointer transition rounded-lg transition d-none d-lg-flex d-xl-none"
+      />
+      <img
+        height="350"
+        width="100%"
+        :src="item.background_image"
+        class="image cursor-pointer transition rounded-lg transition d-none d-xl-flex"
       />
       <v-icon class="icon d-none pa-5 rounded-xl cursor-pointer" icon="mdi-heart" />
       <span class="metacritic d-none pa-2 rounded-lg">{{ item?.metacritic }}</span>
