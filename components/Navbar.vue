@@ -1,3 +1,4 @@
+is
 <template>
   <v-app-bar
     :class="isScrolledToBottom ? 'scrolled' : ''"
@@ -26,8 +27,14 @@
           size="large"
           :icon="_store.theme === 'light' ? 'mdi-weather-night' : 'mdi-weather-sunny'"
         />
-        <v-btn variant="outlined" class="transition rounded-lg login-btn" text="Login" />
         <v-btn
+          @click="onLogin"
+          variant="outlined"
+          class="transition rounded-lg login-btn"
+          text="Login"
+        />
+        <v-btn
+          @click="onSignUp"
           variant="outlined"
           class="transition rounded-lg signup-btn"
           text="Signup"
@@ -115,6 +122,91 @@
       >
     </v-row>
   </v-row>
+
+  <v-dialog v-model="isLoginWrapper" :max-width="600">
+    <v-form
+      class="login-form rounded-lg pa-5 d-flex flex-column ga-1 ga-md-2"
+      ref="form"
+      @submit.prevenet="validate"
+    >
+      <h3
+        v-if="isLogin"
+        class="text-subtitle-1 text-md-h3 text-center text-uppercase mb-5 mb-md-10 text-white"
+      >
+        Login
+      </h3>
+      <h3
+        v-if="isSignUp"
+        class="text-subtitle-1 text-md-h3 text-center text-uppercase mb-5 mb-md-10 text-white"
+      >
+        Signup
+      </h3>
+      <v-text-field
+        v-if="isSignUp"
+        class="fullname-input"
+        v-model="models.userFullName"
+        :rules="rules.fullName"
+        type="text"
+        prepend-inner-icon="mdi-account"
+        label="full name"
+        variant="outlined"
+        placeholder="John Doe"
+        color="cyan"
+        rounded="xl"
+        clerable
+      />
+      <v-text-field
+        class="email-input"
+        v-model="models.email"
+        :rules="rules.email"
+        type="text"
+        prepend-inner-icon="mdi-email"
+        label="email"
+        variant="outlined"
+        placeholder="johndoe@mail.com"
+        color="cyan"
+        rounded="xl"
+        clerable
+      />
+      <v-text-field
+        class="passw-input"
+        v-model="models.password"
+        :rules="rules.password"
+        :type="showPassword ? 'text' : 'password'"
+        prepend-inner-icon="mdi-lock"
+        label="password"
+        variant="outlined"
+        rounded="xl"
+        color="cyan"
+      >
+        <template v-slot:append-inner>
+          <v-icon
+            :icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            @click="togglePasswordVisibility"
+          />
+        </template>
+      </v-text-field>
+      <v-btn
+        variant="outlined"
+        class="bg-success border-none rounded-xl font-weight-bold"
+        :text="isSignUp ? 'signup' : 'login'"
+      />
+      <v-btn
+        @click="closeForm"
+        variant="outlined"
+        class="bg-error border-none rounded-xl font-weight-bold"
+        text="cancel"
+      />
+      <div class="mx-auto mt-2 mt-md-4">
+        <span
+          @click="changeLoginStatus"
+          class="action-text transition text-caption text-sm-subtitle-2 text-grey cursor-pointer"
+        >
+          {{ isLogin ? "Don't have an account yet?" : "Do you already have an account?" }}
+        </span>
+      </div>
+    </v-form>
+  </v-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -126,9 +218,6 @@ const router = useRouter();
 const route = useRoute();
 const searchResults = ref([]);
 
-const models = ref({
-  name: "",
-});
 const isSmLoading = ref(false);
 const isScrolledToBottom = ref(false);
 const api_key = useRuntimeConfig().app.apiKey;
@@ -164,6 +253,91 @@ const openGame = (item: any) => {
   models.value.name = "";
 };
 
+// ! user authenticate
+
+const form = ref(null);
+const isLoginWrapper = ref(false);
+const isLogin = ref(false);
+const isSignUp = ref(false);
+const showPassword = ref(false);
+
+const models = ref({
+  name: "",
+  userFullName: "",
+  email: "",
+  password: "",
+});
+
+const rules = reactive({
+  fullName: [
+    (v: any) => !!v || "full name required",
+    (v: any) => v.length > 4 || "full name must bigger than 4 characters",
+  ],
+  email: [
+    (v: any) =>
+      /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || "email must be valid",
+  ],
+  password: [
+    (v: any) => !!v || "password required",
+    (v: any) => v.length > 5 || "password must bigger than 5 characters",
+  ],
+});
+
+const togglePasswordVisibility = () => {
+  showPassword.value = !showPassword.value;
+};
+
+const clearModel = () => {
+  models.value.email = "";
+  models.value.password = "";
+  models.value.userFullName = "";
+};
+
+const onLogin = () => {
+  clearModel();
+  isLoginWrapper.value = true;
+  isSignUp.value = false;
+  isLogin.value = true;
+};
+
+const onSignUp = () => {
+  clearModel();
+  isLoginWrapper.value = true;
+  isLogin.value = false;
+  isSignUp.value = true;
+};
+
+const closeForm = () => {
+  form.value?.reset();
+  isLoginWrapper.value = false;
+};
+
+const changeLoginStatus = () => {
+  if (isLogin.value) {
+    onSignUp();
+  } else {
+    onLogin();
+  }
+};
+
+const loginUser = async () => {
+  // todo
+};
+
+const createUser = async () => {
+  // todo
+};
+
+const validate = async () => {
+  const { valid } = await form.value?.validate();
+
+  if (valid) {
+    // todo
+  }
+};
+
+// ! ------------
+
 onMounted(() => {
   window.addEventListener("scroll", () => {
     if (window.scrollY > 0) {
@@ -181,7 +355,21 @@ onMounted(() => {
 .scrolled {
   background-color: #fff !important;
 }
-
+.login-form {
+  background: #1a2537;
+}
+.fullname-input,
+.email-input,
+.passw-input {
+  color: #fff !important;
+}
+.action-text {
+  letter-spacing: 1px;
+}
+.action-text:hover {
+  color: #fff !important;
+  text-decoration: underline;
+}
 .form {
   position: relative;
 }
