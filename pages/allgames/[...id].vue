@@ -74,7 +74,7 @@
         :modules="[SwiperFreeMode, SwiperNavigation, SwiperThumbs]"
         :space-between="5"
       >
-        <swiper-slide class="mySwiper2" v-for="slide of game.short_screenshots">
+        <swiper-slide class="mySwiper2 mt-2" v-for="slide of game.short_screenshots">
           <v-img
             height="150"
             class="d-none d-sm-flex rounded-lg"
@@ -93,7 +93,7 @@
 
     <v-col cols="12" md="12" lg="5" class="d-flex flex-column ga-2">
       <!-- genres -->
-      <div class="d-flex justify-start align-center ga-5">
+      <div v-if="game.genres" class="d-flex justify-start align-center ga-5">
         <span class="text-grey">Genres: </span>
         <span class="d-inline text-subtitle-1">
           {{ game?.genres.map((genre:any) => genre.name).join(", ") }}
@@ -101,7 +101,7 @@
       </div>
 
       <!-- release -->
-      <div class="d-flex justify-start align-center ga-5">
+      <div v-if="game.released" class="d-flex justify-start align-center ga-5">
         <span class="text-grey">Released: </span>
         <span class="d-inline text-subtitle-1">
           {{ game?.released?.substring(0, 4) }}
@@ -109,7 +109,7 @@
       </div>
 
       <!-- metacritic -->
-      <div class="d-flex justify-start align-center ga-5">
+      <div v-if="game.metacritic" class="d-flex justify-start align-center ga-5">
         <span class="text-grey">Metacritic: </span>
         <span class="d-inline text-subtitle-1">
           {{ game?.metacritic }}
@@ -118,7 +118,7 @@
       </div>
 
       <!-- stores -->
-      <div class="d-flex justify-start align-center ga-5">
+      <div v-if="game.stores" class="d-flex justify-start align-center ga-5">
         <span class="text-grey">Stores: </span>
         <a
           v-for="store of game?.stores"
@@ -131,7 +131,7 @@
       </div>
 
       <!-- platforms -->
-      <div class="d-flex justify-start align-center ga-5">
+      <div v-if="game.parent_platforms" class="d-flex justify-start align-center ga-5">
         <span class="text-grey">Platforms: </span>
         <div class="platforms">
           <span v-for="pl of game?.parent_platforms" class="d-inline">
@@ -188,7 +188,7 @@
       </div>
 
       <!-- tags -->
-      <div class="mt-5">
+      <div v-if="game.tags" class="mt-5">
         <v-chip class="ma-1" v-for="tag of game.tags" :key="tag.id">{{
           tag.name
         }}</v-chip>
