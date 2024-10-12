@@ -13,6 +13,7 @@ const store = defineStore("piniaStore", {
             allGamesListByCategory: null,
             genres: null,
             activeCategory: null,
+            users: []
         };
     },
     actions: {
@@ -91,6 +92,9 @@ const store = defineStore("piniaStore", {
                 this.currentPageUrlByCategories = `https://api.rawg.io/api/games?key=${this.api_key}&ordering=-metacritic`;
                 this.getAllGameByCategories(this.currentPageUrlByCategories);
             }
+        },
+        setUser(fullName, id) {
+            this.users.push({ fullName: fullName, userId: id })
         }
     },
     persist: true

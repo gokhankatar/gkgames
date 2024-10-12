@@ -2,6 +2,7 @@
 import store from "./store/store";
 
 const _store = store();
+const { $firebase } = useNuxtApp();
 </script>
 
 <template>

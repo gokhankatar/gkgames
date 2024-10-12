@@ -4,7 +4,13 @@ export default defineNuxtConfig({
   runtimeConfig: {
     app: {
       apiKey: process.env.API_KEY,
-      apiKeyNews: process.env.API_KEY_NEWS
+      apiKeyNews: process.env.API_KEY_NEWS,
+      apiKeyFirebase: process.env.API_KEY_FIREBASE,
+      authDomain: process.env.AUTH_DOMAIN,
+      projectId: process.env.PROJECT_ID,
+      storageBucket: process.env.STORAGE_BUCKET,
+      messagingSenderId: process.env.MESSAGING_SENDER_ID,
+      appId: process.env.APP_ID
     }
   },
   modules: [
@@ -25,5 +31,6 @@ export default defineNuxtConfig({
   },
   css: [
     '~/assets/css/main.css'
-  ]
+  ],
+  plugins: ['~/plugins/firebase.js'],
 });
