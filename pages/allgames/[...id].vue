@@ -27,8 +27,9 @@
   </v-row>
   <v-row v-if="!isLoading">
     <v-col cols="12" md="12" lg="6">
+      <!-- Main Slider -->
       <swiper
-        :modules="[SwiperFreeMode, SwiperAutoplay, SwiperNavigation]"
+        :modules="[SwiperFreeMode, SwiperAutoplay, SwiperNavigation, SwiperThumbs]"
         :freeMode="true"
         :grab-cursor="true"
         :navigation="{
@@ -39,6 +40,9 @@
         :autoplay="{
           delay: 4500,
           disableOnInteraction: false,
+        }"
+        :thumbs="{
+          swiper: thumbsSwiper,
         }"
         class="mySwiper"
       >
@@ -52,7 +56,11 @@
         >
           <v-icon icon="mdi-arrow-right" size="x-large" />
         </div>
-        <swiper-slide class="mySwiper" v-for="slide of game.short_screenshots">
+        <swiper-slide
+          class="mySwiper"
+          v-for="(slide, index) in game.short_screenshots"
+          :key="index"
+        >
           <v-img
             height="50vh"
             class="d-none d-sm-flex rounded-lg"
@@ -67,14 +75,22 @@
           />
         </swiper-slide>
       </swiper>
+
+      <!-- Thumbnail Slider -->
       <swiper
+        ref="thumbsSwiperRef"
+        :modules="[SwiperFreeMode, SwiperNavigation, SwiperThumbs]"
         :slidesPerView="3"
         :freeMode="true"
         :watchSlidesProgress="true"
-        :modules="[SwiperFreeMode, SwiperNavigation, SwiperThumbs]"
         :space-between="5"
+        @swiper="setThumbsSwiper"
       >
-        <swiper-slide class="mySwiper2 mt-2" v-for="slide of game.short_screenshots">
+        <swiper-slide
+          class="mySwiper2 mt-2 mt-lg-3 mt-xl-4 cursor-pointer"
+          v-for="(slide, index) in game.short_screenshots"
+          :key="index"
+        >
           <v-img
             height="150"
             class="d-none d-sm-flex rounded-lg"
@@ -253,6 +269,12 @@ const handleReq = async () => {
       requirements.value = true;
     }
   });
+};
+
+const thumbsSwiper = ref(null);
+
+const setThumbsSwiper = (swiper: any) => {
+  thumbsSwiper.value = swiper;
 };
 onMounted(() => {
   handleReq();
