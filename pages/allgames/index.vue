@@ -142,15 +142,21 @@
 import store from "~/store/store";
 import {
   getFirestore,
-  where,
-  getDocs,
   query,
   collection,
+  where,
   addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
 } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const router = useRouter();
 const _store = store();
+
+const db = getFirestore();
+const auth = getAuth();
 
 const handleFavorite = async (item: any) => {
   console.log(item);
