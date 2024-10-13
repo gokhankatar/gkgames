@@ -138,6 +138,7 @@
     >
   </v-row>
 </template>
+
 <script lang="ts" setup>
 import store from "~/store/store";
 import {
@@ -157,9 +158,39 @@ const _store = store();
 
 const db = getFirestore();
 const auth = getAuth();
+const colRef = collection(db, "favorites");
 
 const handleFavorite = async (item: any) => {
-  console.log(item);
+  try {
+    let userId = auth.currentUser?.uid;
+    const q = query(
+      colRef,
+      where("userId", "==", userId),
+      where("item.id", "==", item.id)
+    );
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      await addDoc(colRef, {
+        userId: userId,
+        item: item,
+      });
+    } else {
+      // Eğer item zaten varsa, belgeler silinir
+      querySnapshot.forEach(async (docSnapshot) => {
+        console.log("Silinecek belge kimliği: ", docSnapshot.id); // Belge kimliğini logla
+        try {
+          await deleteDoc(doc(colRef, docSnapshot.id)); // Belgeyi sil
+          console.log("Belge başarıyla silindi: ", docSnapshot.id);
+        } catch (deleteError) {
+          console.error("Belge silinirken hata oluştu: ", deleteError);
+        }
+      });
+      alert("Item silindi");
+    }
+  } catch (error: any) {
+    console.log(error.message);
+  }
 };
 
 onMounted(() => {
