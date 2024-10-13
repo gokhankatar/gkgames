@@ -1,4 +1,5 @@
 <template>
+  <Loading v-if="isLoading" />
   <v-row v-if="!isLoading && favoriteGames.length > 0">
     <v-col
       @click="
@@ -116,7 +117,7 @@
     </v-col>
   </v-row>
 
-  <v-row v-if="favoriteGames.length == 0">
+  <v-row v-if="!isLoading && favoriteGames.length == 0">
     <v-col cols="12">
       <h3 class="text-h5 text-md-h3">You haven't favorite games yet!</h3>
     </v-col>
@@ -143,7 +144,7 @@ const colRef = collection(db, "favorites");
 const getFavoriteGames = async () => {
   try {
     isLoading.value = true; // Yükleme durumu başlatılıyor
-    let userId = auth.currentUser?.uid; // Kullanıcı kimliği alınıyor
+    const userId = auth.currentUser?.uid; // Kullanıcı kimliği alınıyor
 
     // Eğer kullanıcı giriş yapmamışsa işlemi durdur
     if (!userId) {
@@ -157,12 +158,18 @@ const getFavoriteGames = async () => {
 
     // Favori oyunları diziye aktarma
     favoriteGames.value = querySnapshot.docs.map((doc) => doc.data().item);
+    
+    // Eğer dizi boşsa, kullanıcıya bilgi ver
+    if (favoriteGames.value.length === 0) {
+      console.log("Favori oyun bulunamadı.");
+    }
   } catch (error: any) {
     console.log("Hata: ", error.message);
   } finally {
     isLoading.value = false; // Yükleme durumu bitiriliyor
   }
 };
+
 
 const removeFromFavorite = async (item: any) => {
   try {
