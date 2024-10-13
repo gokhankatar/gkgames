@@ -11,6 +11,11 @@ import {
 
 const { $firebase } = useNuxtApp();
 const auth = getAuth();
+const isUser = ref(false);
+const currentUser = ref({
+  name: null,
+  id: null,
+});
 const _store = store();
 const router = useRouter();
 const route = useRoute();
@@ -20,11 +25,6 @@ const isScrolledToBottom = ref(false);
 const api_key = useRuntimeConfig().app.apiKey;
 const errorMsg = "Username or password is incorrect!";
 const errorLogin = ref(false);
-const isUser = ref(false);
-const currentUser = ref({
-  name: null,
-  id: null,
-});
 
 const searchGame = async () => {
   try {
@@ -259,7 +259,7 @@ onMounted(() => {
           <span
             class="font-weight-bold text-caption text-sm-subtitle-1"
             v-if="currentUser.name"
-            >{{ currentUser.name }}</span
+            >{{ currentUser?.name }}</span
           >
         </div>
         <v-menu v-if="isUser" activator="#currentUser">

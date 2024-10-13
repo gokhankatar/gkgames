@@ -95,7 +95,7 @@ const store = defineStore("piniaStore", {
         },
         setUser(fullName, id) {
             this.users.push({ fullName: fullName, userId: id })
-        }
+        },
     },
     persist: true
 });

@@ -34,22 +34,31 @@
         :src="item.background_image"
         class="image d-none d-xl-flex cursor-pointer transition rounded-lg transition"
       />
-      <v-icon class="icon d-none pa-5 rounded-xl cursor-pointer" icon="mdi-heart" />
+      <v-icon
+        @click.stop="handleFavorite(item)"
+        class="icon d-none pa-5 rounded-xl cursor-pointer"
+        icon="mdi-heart"
+      />
+
       <span class="metacritic d-none pa-2 rounded-lg">{{ item?.metacritic }}</span>
+
       <div class="content-info d-flex flex-column ga-2 rounded-lg pa-3">
         <span class="info-name d-flex text-subtitle-1 text-md-h5">{{ item.name }}</span>
+
         <div class="d-flex justify-space-between align-center">
           <span class="text-grey">Genres: </span>
           <span class="d-inline text-caption">
             {{ item?.genres.map((genre:any) => genre.name).join(", ") }}
           </span>
         </div>
+
         <div class="d-flex justify-space-between align-center">
           <span class="text-grey">Released: </span>
           <span class="d-inline text-caption">
             {{ item?.released?.substring(0, 4) }}
           </span>
         </div>
+
         <div class="d-flex justify-space-between align-center">
           <span class="text-grey">Platforms: </span>
           <div class="platforms">
@@ -131,9 +140,21 @@
 </template>
 <script lang="ts" setup>
 import store from "~/store/store";
+import {
+  getFirestore,
+  where,
+  getDocs,
+  query,
+  collection,
+  addDoc,
+} from "firebase/firestore";
 
 const router = useRouter();
 const _store = store();
+
+const handleFavorite = async (item: any) => {
+  console.log(item);
+};
 
 onMounted(() => {
   _store.getAllGames(_store.currentPageUrl);

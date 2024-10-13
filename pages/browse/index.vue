@@ -183,7 +183,11 @@
         :src="item.background_image"
         class="image cursor-pointer transition rounded-lg transition d-none d-xl-flex"
       />
-      <v-icon class="icon d-none pa-5 rounded-xl cursor-pointer" icon="mdi-heart" />
+      <v-icon
+        @click.stop="handleFavorite(item)"
+        class="icon d-none pa-5 rounded-xl cursor-pointer"
+        icon="mdi-heart"
+      />
       <span v-if="item.metacritic" class="metacritic d-none pa-2 rounded-lg">{{
         item?.metacritic
       }}</span>
@@ -288,6 +292,10 @@ import store from "~/store/store";
 const router = useRouter();
 const _store = store();
 const api_key = useRuntimeConfig().app.apiKey;
+
+const handleFavorite = async (item: any) => {
+  console.log(item);
+};
 
 onMounted(async () => {
   await nextTick();

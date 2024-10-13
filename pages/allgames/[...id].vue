@@ -264,7 +264,7 @@ const game = computed(() => {
   }
 });
 const handleReq = async () => {
-  await game.value.platforms.forEach((g) => {
+  await game.value.platforms.forEach((g: any) => {
     if (g.requirements_en) {
       requirements.value = true;
     }
@@ -276,6 +276,8 @@ const thumbsSwiper = ref(null);
 const setThumbsSwiper = (swiper: any) => {
   thumbsSwiper.value = swiper;
 };
+
+const handleFavorite = async (game: any) => {};
 onMounted(() => {
   handleReq();
 });
