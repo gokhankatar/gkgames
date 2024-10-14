@@ -39,7 +39,9 @@
         icon="mdi-delete"
       />
 
-      <span class="metacritic d-none pa-2 rounded-lg">{{ item?.metacritic }}</span>
+      <span v-if="item.metacritic" class="metacritic d-none pa-2 rounded-lg">{{
+        item?.metacritic
+      }}</span>
 
       <div class="content-info d-flex flex-column ga-2 rounded-lg pa-3">
         <span class="info-name d-flex text-subtitle-1 text-md-h5">{{ item.name }}</span>
@@ -122,9 +124,17 @@
       <h3 class="text-h5 text-md-h3">You haven't favorite games yet!</h3>
     </v-col>
   </v-row>
+
+  <v-snackbar
+    v-if="!isLoading"
+    v-model="isInfo"
+    :color="info.state === 'success' ? 'success' : 'error'"
+    timeout="1500"
+    >{{ info.msg }}</v-snackbar
+  >
 </template>
 <script lang="ts" setup>
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
   getFirestore,
   query,
@@ -134,12 +144,17 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 
-const isLoading = ref(false);
+const isLoading = ref(true);
 const favoriteGames = ref([]);
 const router = useRouter();
 const auth = getAuth();
 const db = getFirestore();
 const colRef = collection(db, "favorites");
+const isInfo = ref(false);
+const info = ref({
+  msg: "",
+  state: "",
+});
 
 const getFavoriteGames = async () => {
   try {
@@ -158,25 +173,18 @@ const getFavoriteGames = async () => {
 
     // Favori oyunları diziye aktarma
     favoriteGames.value = querySnapshot.docs.map((doc) => doc.data().item);
-    
-    // Eğer dizi boşsa, kullanıcıya bilgi ver
-    if (favoriteGames.value.length === 0) {
-      console.log("Favori oyun bulunamadı.");
-    }
   } catch (error: any) {
     console.log("Hata: ", error.message);
   } finally {
-    isLoading.value = false; // Yükleme durumu bitiriliyor
+    isLoading.value = false;
   }
 };
 
-
 const removeFromFavorite = async (item: any) => {
   try {
-    isLoading.value = true; // Yükleme durumu başlatılıyor
-    const userId = auth.currentUser?.uid; // Kullanıcı kimliği alınıyor
+    isLoading.value = true;
+    const userId = auth.currentUser?.uid;
 
-    // Eğer kullanıcı giriş yapmamışsa işlemi durdur
     if (!userId) {
       console.log("Kullanıcı kimliği bulunamadı");
       return;
@@ -201,6 +209,9 @@ const removeFromFavorite = async (item: any) => {
         favoriteGames.value = favoriteGames.value.filter(
           (game: any) => game.id !== item.id
         );
+        info.value.msg = "This game deleted from your favorite list";
+        info.value.state = "error";
+        isInfo.value = true;
       } catch (error: any) {
         console.log(error.message);
       } finally {
@@ -214,8 +225,15 @@ const removeFromFavorite = async (item: any) => {
   }
 };
 
-onMounted(() => {
-  getFavoriteGames();
+onMounted(async () => {
+  await nextTick();
+  isLoading.value = false;
+  // Kullanıcı oturumu yüklendiğinde getFavoriteGames'i çağır
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      getFavoriteGames(); // Kullanıcı giriş yapmışsa favori oyunları getir
+    }
+  });
 });
 </script>
 <style scoped>

@@ -209,6 +209,13 @@
           tag.name
         }}</v-chip>
       </div>
+      <v-btn
+        @click="handleFavorite"
+        :class="isAlreadyFavorite ? 'already-favorite' : ''"
+        class="favorite-btn rounded-xl transition w-auto mt-3"
+        :text="isAlreadyFavorite ? 'remove from favorites' : 'add to favorites'"
+        :prepend-icon="isAlreadyFavorite ? 'mdi-delete' : 'mdi-heart'"
+      />
     </v-col>
   </v-row>
 
@@ -239,9 +246,27 @@
       </v-card>
     </v-col>
   </v-row>
+
+  <v-snackbar
+    v-model="isInfo"
+    :color="info.state === 'success' ? 'success' : 'error'"
+    timeout="1500"
+    >{{ info.msg }}</v-snackbar
+  >
 </template>
 <script lang="ts" setup>
 import { SwiperFreeMode, SwiperNavigation, SwiperThumbs } from "#imports";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import {
+  getFirestore,
+  query,
+  collection,
+  where,
+  getDocs,
+  deleteDoc,
+  doc,
+  setDoc,
+} from "firebase/firestore";
 
 definePageMeta({
   layout: "single-game",
@@ -251,6 +276,15 @@ const router = useRouter();
 const route = useRoute();
 const isLoading = ref(false);
 const requirements = ref(false);
+const isAlreadyFavorite = ref(false);
+const isInfo = ref(false);
+const info = ref({
+  msg: "",
+  state: "",
+});
+const auth = getAuth();
+const db = getFirestore();
+const colRef = collection(db, "favorites");
 
 const game = computed(() => {
   const gameData = route.query.game;
@@ -263,6 +297,7 @@ const game = computed(() => {
     isLoading.value = false;
   }
 });
+
 const handleReq = async () => {
   await game.value.platforms.forEach((g: any) => {
     if (g.requirements_en) {
@@ -277,9 +312,51 @@ const setThumbsSwiper = (swiper: any) => {
   thumbsSwiper.value = swiper;
 };
 
-const handleFavorite = async (game: any) => {};
-onMounted(() => {
-  handleReq();
+const checkIfFavorite = async () => {
+  const userId = auth.currentUser?.uid;
+  if (!userId || !game.value) return;
+
+  const q = query(
+    colRef,
+    where("userId", "==", userId),
+    where("gameId", "==", game.value.id)
+  );
+  const querySnapshot = await getDocs(q);
+
+  isAlreadyFavorite.value = !querySnapshot.empty;
+};
+
+const handleFavorite = async () => {
+  const userId = auth.currentUser?.uid;
+  if (!userId || !game.value) return;
+
+  const docRef = doc(colRef, `${userId}_${game.value.id}`);
+
+  if (isAlreadyFavorite.value) {
+    await deleteDoc(docRef);
+    isAlreadyFavorite.value = false;
+    info.value.msg = "This game deleted from your favorite list";
+    info.value.state = "error";
+    isInfo.value = true;
+  } else {
+    await setDoc(docRef, {
+      userId,
+      item: game.value,
+    });
+    isAlreadyFavorite.value = true;
+    info.value.msg = "This game added to your favorite list";
+    info.value.state = "success";
+    isInfo.value = true;
+  }
+};
+
+onMounted(async () => {
+  await nextTick();
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      checkIfFavorite();
+    }
+  });
 });
 </script>
 <style scoped>
@@ -334,5 +411,23 @@ onMounted(() => {
 }
 .back-btn:hover {
   color: #000 !important;
+}
+.favorite-btn {
+  border: 1px solid red;
+  background-color: transparent;
+  color: red;
+}
+.favorite-btn:hover {
+  background-color: red;
+  color: #fff;
+}
+.already-favorite {
+  border-color: #ef5350 !important;
+  color: #ef5350 !important;
+}
+.already-favorite:hover {
+  background-color: #ef5350 !important;
+  border-color: #ef5350 !important;
+  color: #fff !important;
 }
 </style>

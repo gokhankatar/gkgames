@@ -158,6 +158,7 @@
           query: { game: JSON.stringify(item) },
         })
       "
+      @mousemove="checkIfFavorite(item)"
       class="game-wrapper cursor-pointer"
       v-for="(item, index) of _store.allGamesListByCategory?.results"
       :key="item.id"
@@ -186,7 +187,7 @@
       <v-icon
         @click.stop="handleFavorite(item)"
         class="icon d-none pa-5 rounded-xl cursor-pointer"
-        icon="mdi-heart"
+        :icon="isAlreadyFavorite ? 'mdi-delete' : 'mdi-heart'"
       />
       <span v-if="item.metacritic" class="metacritic d-none pa-2 rounded-lg">{{
         item?.metacritic
@@ -285,16 +286,86 @@
       >next page</v-btn
     >
   </v-row>
+
+  <v-snackbar
+    v-model="isInfo"
+    :color="info.state === 'success' ? 'success' : 'error'"
+    timeout="1500"
+    >{{ info.msg }}</v-snackbar
+  >
 </template>
 <script lang="ts" setup>
 import store from "~/store/store";
+import {
+  getFirestore,
+  query,
+  collection,
+  where,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const router = useRouter();
 const _store = store();
 const api_key = useRuntimeConfig().app.apiKey;
 
+const db = getFirestore();
+const auth = getAuth();
+const colRef = collection(db, "favorites");
+const isAlreadyFavorite = ref(false);
+const isInfo = ref(false);
+const info = ref({
+  msg: "",
+  state: "",
+});
+
+const checkIfFavorite = async (item: any) => {
+  const userId = auth.currentUser?.uid;
+  if (!userId) return;
+
+  const q = query(colRef, where("userId", "==", userId), where("item.id", "==", item.id));
+  const querySnapshot = await getDocs(q);
+
+  isAlreadyFavorite.value = !querySnapshot.empty;
+};
+
 const handleFavorite = async (item: any) => {
-  console.log(item);
+  try {
+    const userId = auth.currentUser?.uid;
+    const q = query(
+      colRef,
+      where("userId", "==", userId),
+      where("item.id", "==", item.id)
+    );
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      await addDoc(colRef, {
+        userId: userId,
+        item: item,
+      });
+
+      info.value.msg = "This item has been added to your favorite list";
+      info.value.state = "success";
+      isInfo.value = true;
+    } else {
+      querySnapshot.forEach(async (docSnapshot) => {
+        try {
+          await deleteDoc(doc(colRef, docSnapshot.id));
+        } catch (deleteError) {
+          console.error("Error deleting document: ", deleteError);
+        }
+      });
+      info.value.msg = "This item has been removed from your favorite list";
+      info.value.state = "error";
+      isInfo.value = true;
+    }
+  } catch (error) {
+    console.error("Error handling favorite: ", error);
+  }
 };
 
 onMounted(async () => {

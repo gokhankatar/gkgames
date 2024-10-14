@@ -9,6 +9,7 @@
           query: { game: JSON.stringify(item) },
         })
       "
+      @mousemove="checkIfFavorite(item)"
       class="game-wrapper cursor-pointer"
       v-for="(item, index) of _store.allGamesList?.results"
       :key="item.id"
@@ -37,10 +38,12 @@
       <v-icon
         @click.stop="handleFavorite(item)"
         class="icon d-none pa-5 rounded-xl cursor-pointer"
-        icon="mdi-heart"
+        :icon="isAlreadyFavorite ? 'mdi-delete' : 'mdi-heart'"
       />
 
-      <span class="metacritic d-none pa-2 rounded-lg">{{ item?.metacritic }}</span>
+      <span v-if="item.metacritic" class="metacritic d-none pa-2 rounded-lg">{{
+        item?.metacritic
+      }}</span>
 
       <div class="content-info d-flex flex-column ga-2 rounded-lg pa-3">
         <span class="info-name d-flex text-subtitle-1 text-md-h5">{{ item.name }}</span>
@@ -137,6 +140,13 @@
       >next page</v-btn
     >
   </v-row>
+
+  <v-snackbar
+    v-model="isInfo"
+    :color="info.state === 'success' ? 'success' : 'error'"
+    timeout="1500"
+    >{{ info.msg }}</v-snackbar
+  >
 </template>
 
 <script lang="ts" setup>
@@ -159,10 +169,26 @@ const _store = store();
 const db = getFirestore();
 const auth = getAuth();
 const colRef = collection(db, "favorites");
+const isAlreadyFavorite = ref(false);
+const isInfo = ref(false);
+const info = ref({
+  msg: "",
+  state: "",
+});
+
+const checkIfFavorite = async (item: any) => {
+  const userId = auth.currentUser?.uid;
+  if (!userId) return;
+
+  const q = query(colRef, where("userId", "==", userId), where("item.id", "==", item.id));
+  const querySnapshot = await getDocs(q);
+
+  isAlreadyFavorite.value = !querySnapshot.empty;
+};
 
 const handleFavorite = async (item: any) => {
   try {
-    let userId = auth.currentUser?.uid;
+    const userId = auth.currentUser?.uid;
     const q = query(
       colRef,
       where("userId", "==", userId),
@@ -175,21 +201,24 @@ const handleFavorite = async (item: any) => {
         userId: userId,
         item: item,
       });
+
+      info.value.msg = "This item has been added to your favorite list";
+      info.value.state = "success";
+      isInfo.value = true;
     } else {
-      // Eğer item zaten varsa, belgeler silinir
       querySnapshot.forEach(async (docSnapshot) => {
-        console.log("Silinecek belge kimliği: ", docSnapshot.id); // Belge kimliğini logla
         try {
-          await deleteDoc(doc(colRef, docSnapshot.id)); // Belgeyi sil
-          console.log("Belge başarıyla silindi: ", docSnapshot.id);
+          await deleteDoc(doc(colRef, docSnapshot.id));
         } catch (deleteError) {
-          console.error("Belge silinirken hata oluştu: ", deleteError);
+          console.error("Error deleting document: ", deleteError);
         }
       });
-      alert("Item silindi");
+      info.value.msg = "This item has been removed from your favorite list";
+      info.value.state = "error";
+      isInfo.value = true;
     }
-  } catch (error: any) {
-    console.log(error.message);
+  } catch (error) {
+    console.error("Error handling favorite: ", error);
   }
 };
 

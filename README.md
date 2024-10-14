@@ -1,6 +1,13 @@
 ## title ve seoları ekle
-# backend kısmına geç
 
-- silme ekleme yapıldı fakat favoride varsa işaretli olması gerek ve işlem mesajlarının gösterilmesi gerek
+# front end
+
+- favorites te layout degistir
+- geri dön butonu ekle
+- navbar daki aktif route favorites te etkili olmamalı
+
+# backend 
+
+- ilgili oyuna gittigimizde favorilerde olup olmama kontrolunu saglamlastır
 
 # oyun bulma motoru yap 

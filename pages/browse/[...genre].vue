@@ -33,6 +33,7 @@
           query: { game: JSON.stringify(item) },
         })
       "
+      @mousemove="checkIfFavorite(item)"
       class="game-wrapper cursor-pointer"
       v-for="(item, index) of gamesList?.results"
       :key="item.id"
@@ -58,7 +59,11 @@
         :src="item.background_image"
         class="image cursor-pointer transition rounded-lg transition d-none d-xl-flex"
       />
-      <v-icon class="icon d-none pa-5 rounded-xl cursor-pointer" icon="mdi-heart" />
+      <v-icon
+        @click.stop="handleFavorite(item)"
+        class="icon d-none pa-5 rounded-xl cursor-pointer"
+        :icon="isAlreadyFavorite ? 'mdi-delete' : 'mdi-heart'"
+      />
       <span class="metacritic d-none pa-2 rounded-lg">{{ item?.metacritic }}</span>
       <div class="content-info d-flex flex-column ga-2 rounded-lg pa-3">
         <span class="info-name d-flex text-subtitle-1 text-md-h5">{{ item.name }}</span>
@@ -132,6 +137,7 @@
       </div>
     </v-col>
   </v-row>
+
   <v-row v-if="!isLoading" class="mt-15 flex justify-center align-center ga-3">
     <v-btn
       class="actions-btn transition rounded-xl text-white"
@@ -148,18 +154,49 @@
       >next page</v-btn
     >
   </v-row>
+
+  <v-snackbar
+    v-model="isInfo"
+    :color="info.state === 'success' ? 'success' : 'error'"
+    timeout="1500"
+    >{{ info.msg }}</v-snackbar
+  >
 </template>
 
 <script lang="ts" setup>
+import {
+  getFirestore,
+  query,
+  collection,
+  where,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+
 definePageMeta({
   layout: "single-game",
 });
+
 const route = useRoute();
 const router = useRouter();
 const isLoading = ref(false);
 const previousPageUrl = ref(null);
 const nextPageUrl = ref(null);
 const gamesList = ref(null);
+
+const db = getFirestore();
+const auth = getAuth();
+const colRef = collection(db, "favorites");
+const isAlreadyFavorite = ref(false);
+const isInfo = ref(false);
+const info = ref({
+  msg: "",
+  state: "",
+});
+
 const getGenres = async () => {
   try {
     isLoading.value = true;
@@ -185,6 +222,52 @@ const getAllGamesForPage = async (page: any) => {
     console.log(error.message);
   } finally {
     isLoading.value = false;
+  }
+};
+
+const checkIfFavorite = async (item: any) => {
+  const userId = auth.currentUser?.uid;
+  if (!userId) return;
+
+  const q = query(colRef, where("userId", "==", userId), where("item.id", "==", item.id));
+  const querySnapshot = await getDocs(q);
+
+  isAlreadyFavorite.value = !querySnapshot.empty;
+};
+
+const handleFavorite = async (item: any) => {
+  try {
+    const userId = auth.currentUser?.uid;
+    const q = query(
+      colRef,
+      where("userId", "==", userId),
+      where("item.id", "==", item.id)
+    );
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      await addDoc(colRef, {
+        userId: userId,
+        item: item,
+      });
+
+      info.value.msg = "This item has been added to your favorite list";
+      info.value.state = "success";
+      isInfo.value = true;
+    } else {
+      querySnapshot.forEach(async (docSnapshot) => {
+        try {
+          await deleteDoc(doc(colRef, docSnapshot.id));
+        } catch (deleteError) {
+          console.error("Error deleting document: ", deleteError);
+        }
+      });
+      info.value.msg = "This item has been removed from your favorite list";
+      info.value.state = "error";
+      isInfo.value = true;
+    }
+  } catch (error) {
+    console.error("Error handling favorite: ", error);
   }
 };
 onMounted(async () => {
