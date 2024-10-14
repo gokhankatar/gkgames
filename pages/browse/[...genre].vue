@@ -197,6 +197,11 @@ const info = ref({
   state: "",
 });
 
+useHead({
+  title: `GKGames - ${route.query.name} Games`,
+});
+
+
 const getGenres = async () => {
   try {
     isLoading.value = true;

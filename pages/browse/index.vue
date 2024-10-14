@@ -308,6 +308,10 @@ import {
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
+useHead({
+  title: "GKGames - Browse Games",
+});
+
 const router = useRouter();
 const _store = store();
 const api_key = useRuntimeConfig().app.apiKey;

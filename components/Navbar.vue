@@ -335,11 +335,7 @@ onMounted(() => {
     >
       <span
         @click="router.replace('/')"
-        :class="
-          !route.fullPath.includes('brows') && !route.fullPath.includes('allgames')
-            ? 'active-link'
-            : ''
-        "
+        :class="(route.fullPath == '/' ? 'active-link' : '')"
         class="link transition rounded cursor-pointer pa-1 pa-sm-2 text-subtitle-1"
         >Discover</span
       >

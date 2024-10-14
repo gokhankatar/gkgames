@@ -254,8 +254,8 @@
     >{{ info.msg }}</v-snackbar
   >
 </template>
+
 <script lang="ts" setup>
-import { SwiperFreeMode, SwiperNavigation, SwiperThumbs } from "#imports";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
   getFirestore,
@@ -298,6 +298,10 @@ const game = computed(() => {
   }
 });
 
+useHead({
+  title: `GKGames - ${game.value?.name}`,
+});
+
 const handleReq = async () => {
   await game.value.platforms.forEach((g: any) => {
     if (g.requirements_en) {
@@ -319,7 +323,7 @@ const checkIfFavorite = async () => {
   const q = query(
     colRef,
     where("userId", "==", userId),
-    where("gameId", "==", game.value.id)
+    where("item.id", "==", game.value.id)
   );
   const querySnapshot = await getDocs(q);
 
@@ -335,7 +339,7 @@ const handleFavorite = async () => {
   if (isAlreadyFavorite.value) {
     await deleteDoc(docRef);
     isAlreadyFavorite.value = false;
-    info.value.msg = "This game deleted from your favorite list";
+    info.value.msg = "This item has been removed from your favorite list";
     info.value.state = "error";
     isInfo.value = true;
   } else {
@@ -344,7 +348,7 @@ const handleFavorite = async () => {
       item: game.value,
     });
     isAlreadyFavorite.value = true;
-    info.value.msg = "This game added to your favorite list";
+    info.value.msg = "This item has been added to your favorite list";
     info.value.state = "success";
     isInfo.value = true;
   }
@@ -359,6 +363,7 @@ onMounted(async () => {
   });
 });
 </script>
+
 <style scoped>
 .card-req {
   overflow-y: auto;

@@ -1,5 +1,13 @@
 <template>
   <Loading v-if="isLoading" />
+
+  <v-row v-if="!isLoading" class="mt-5">
+    <v-col cols="12" class="d-flex flex-column">
+      <h3 class="text-h5 text-md-h3">Favorites</h3>
+      <hr class="w-100 w-md-25 mt-2 mb-5" color="cyan" />
+    </v-col>
+  </v-row>
+
   <v-row v-if="!isLoading && favoriteGames.length > 0">
     <v-col
       @click="
@@ -143,6 +151,10 @@ import {
   getDocs,
   deleteDoc,
 } from "firebase/firestore";
+
+useHead({
+  title: "GKGames - Favorites",
+});
 
 const isLoading = ref(true);
 const favoriteGames = ref([]);
