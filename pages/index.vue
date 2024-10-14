@@ -404,15 +404,25 @@ const openToNews = (item: any) => {
 const getNewGames = async () => {
   try {
     isLoading.value = true;
-    const url = `https://api.rawg.io/api/games?key=${apiKey}&dates=2024-10-05,2025-10-05&ordering=released`;
+
+    const currentDate = new Date().toISOString().slice(0, 10);
+    const endDate = new Date();
+    endDate.setFullYear(endDate.getFullYear() + 1);
+    const formattedEndDate = endDate.toISOString().slice(0, 10);
+
+    const url = `https://api.rawg.io/api/games?key=${apiKey}&dates=${currentDate},${formattedEndDate}&ordering=released`;
     const data = await $fetch(url);
-    newGames.value = data?.results;
+
+    newGames.value = data?.results?.filter((game: any) => {
+      return !game.tags?.some((tag: any) => tag.name.toLowerCase() === "nudity");
+    });
   } catch (error: any) {
     console.log(error.message);
   } finally {
     isLoading.value = false;
   }
 };
+
 const getBestGames = async () => {
   try {
     isLoading.value = true;
@@ -425,6 +435,7 @@ const getBestGames = async () => {
     isLoading.value = false;
   }
 };
+
 const getPopularGames = async () => {
   try {
     isLoading.value = true;
