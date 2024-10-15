@@ -244,6 +244,8 @@ onMounted(async () => {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       getFavoriteGames(); // Kullanıcı giriş yapmışsa favori oyunları getir
+    } else {
+      router.push("/");
     }
   });
 });
