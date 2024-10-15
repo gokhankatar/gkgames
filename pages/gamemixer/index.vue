@@ -26,10 +26,18 @@
     />
   </v-row>
 
-  <v-row class="main-container pa-0 pa-sm-6 pa-md-9 pa-lg-12 pa-xl-15">
+  <v-row class="main-container px-0 px-sm-6 px-md-9 px-lg-12 px-xl-15">
     <v-col cols="5" class="main-container1">
-      <v-card height="40vh" class="rounded-lg pa-5 d-flex justify-center align-center">
-        <v-card-text class="text-center text-h5 text-md-h3">Game 1</v-card-text>
+      <v-card height="40vh" class="rounded-lg d-flex justify-center align-center">
+        <v-card-text v-if="!primaryGame.img" class="text-center text-h5 text-md-h3"
+          >Game 1</v-card-text
+        >
+        <v-img
+          class="h-100 rounded-lg"
+          v-if="primaryGame.img"
+          :src="primaryGame.img"
+          cover
+        />
       </v-card>
       <v-text-field
         class="mt-5"
@@ -50,10 +58,10 @@
           :width="3"
           color="blue-lighten-1"
           indeterminate
-        ></v-progress-circular>
+        />
 
         <div
-          v-if="gamesFoundPrimary.length > 0"
+          v-if="gamesFoundPrimary.length > 0 && !isSmLoading"
           class="search-wrapper d-flex flex-column ga-1 ga-md-2 rounded-lg pa-3 pa-md-5"
         >
           <div
@@ -100,8 +108,16 @@
     </v-col>
 
     <v-col cols="5" class="main-container2">
-      <v-card height="40vh" class="rounded-lg pa-5 d-flex justify-center align-center">
-        <v-card-text class="text-center text-h5 text-md-h3">Game 2</v-card-text>
+      <v-card height="40vh" class="rounded-lg d-flex justify-center align-center">
+        <v-card-text v-if="!secondaryGame.img" class="text-center text-h5 text-md-h3"
+          >Game 2</v-card-text
+        >
+        <v-img
+          class="h-100 rounded-lg"
+          v-if="secondaryGame.img"
+          :src="secondaryGame.img"
+          cover
+        />
       </v-card>
       <v-text-field
         class="mt-5"
@@ -116,13 +132,13 @@
       />
       <div class="search-results2 rounded-lg pa-3">
         <v-progress-circular
-          v-if="isSmLoading"
+          v-if="isSmLoading2"
           class="smLoadingBar2"
           :size="30"
           :width="3"
           color="blue-lighten-1"
           indeterminate
-        ></v-progress-circular>
+        />
 
         <div
           v-if="gamesFoundSecondary.length > 0"
@@ -165,6 +181,7 @@ definePageMeta({
 const isLoading = ref(false);
 const router = useRouter();
 const isSmLoading = ref(false);
+const isSmLoading2 = ref(false);
 const api_key = useRuntimeConfig().app.apiKey;
 const models = ref({
   primaryGame: "",
@@ -172,8 +189,12 @@ const models = ref({
 });
 const gamesFoundPrimary = ref<any[]>([]);
 const gamesFoundSecondary = ref<any[]>([]);
-const primaryGame = ref();
-const secondaryGame = ref();
+const primaryGame = ref({
+  img: null,
+});
+const secondaryGame = ref({
+  img: null,
+});
 
 const searchGame = async () => {
   try {
@@ -199,7 +220,7 @@ const searchGame = async () => {
 const searchGame2 = async () => {
   try {
     if (models.value.secondaryGame.length > 2) {
-      isSmLoading.value = true;
+      isSmLoading2.value = true;
       const data = await $fetch("https://api.rawg.io/api/games", {
         params: {
           key: api_key,
@@ -213,28 +234,29 @@ const searchGame2 = async () => {
   } catch (error: any) {
     console.log(error.message);
   } finally {
-    isSmLoading.value = false;
+    isSmLoading2.value = false;
   }
 };
 
 const setPrimaryGame = (item: any) => {
   isSmLoading.value = false;
+  primaryGame.value.img = item.background_image;
+
   gamesFoundPrimary.value = [];
   models.value.primaryGame = "";
 };
 
 const setSecondaryGame = (item: any) => {
-  isSmLoading.value = false;
+  isSmLoading2.value = false;
+  secondaryGame.value.img = item.background_image;
+
   gamesFoundSecondary.value = [];
   models.value.secondaryGame = "";
 };
 </script>
+
 <style scoped>
 @import url(/assets/css/main.css);
-
-.main-container {
-  overflow: hidden;
-}
 
 .main-container1,
 .main-container2 {
