@@ -363,7 +363,7 @@
 <script lang="ts" setup>
 import { Mousewheel } from "swiper/modules";
 
-const isLoading = ref(false);
+const isLoading = ref(true);
 const router = useRouter();
 const newsArr = ref<any[]>([]);
 const bestGamesArr = ref<any[]>([]);
@@ -458,6 +458,7 @@ const truncateText = (text: string, length: number) => {
 
 onMounted(async () => {
   await nextTick();
+  isLoading.value = false;
   getNews();
   getNewGames();
   getBestGames();

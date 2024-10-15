@@ -335,7 +335,7 @@ onMounted(() => {
     >
       <span
         @click="router.replace('/')"
-        :class="(route.fullPath == '/' ? 'active-link' : '')"
+        :class="route.fullPath == '/' ? 'active-link' : ''"
         class="link transition rounded cursor-pointer pa-1 pa-sm-2 text-subtitle-1"
         >Discover</span
       >
@@ -351,6 +351,14 @@ onMounted(() => {
         class="link transition rounded cursor-pointer pa-1 pa-sm-2 text-subtitle-1"
         >Browse</span
       >
+      <v-badge class="badge-new transition" content="NEW" color="cyan" text-color="white">
+        <v-btn
+          @click="router.replace('/gamemixer')"
+          variant="outlined"
+          class="bg-light-blue-darken-4 border-none rounded-xl"
+          text="gameMixer"
+        />
+      </v-badge>
     </v-row>
   </v-row>
 
@@ -446,6 +454,10 @@ onMounted(() => {
 
 <style scoped>
 @import url(/assets/css/main.css);
+
+.badge-new:hover {
+  margin-bottom: 0.5rem;
+}
 
 .scrolled {
   background-color: #fff !important;
