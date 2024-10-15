@@ -351,7 +351,12 @@ onMounted(() => {
         class="link transition rounded cursor-pointer pa-1 pa-sm-2 text-subtitle-1"
         >Browse</span
       >
-      <v-badge class="badge-new transition" content="NEW" color="cyan" text-color="white">
+      <v-badge
+        class="badge-new d-none d-sm-flex transition"
+        content="NEW"
+        color="cyan"
+        text-color="white"
+      >
         <v-btn
           @click="router.replace('/gamemixer')"
           variant="outlined"
@@ -360,6 +365,18 @@ onMounted(() => {
         />
       </v-badge>
     </v-row>
+  </v-row>
+  
+  <v-row class="my-5 d-flex d-sm-none justify-center align-center">
+    <v-col cols="12">
+      <v-btn
+        @click="router.replace('/gamemixer')"
+        variant="outlined"
+        class="bg-light-blue-darken-2 border-none rounded-xl"
+        text="gameMixer"
+        block
+      />
+    </v-col>
   </v-row>
 
   <v-dialog v-model="isLoginWrapper" :max-width="600">
