@@ -155,9 +155,12 @@ import {
 useHead({
   title: "GKGames - Favorites",
 });
+definePageMeta({
+  middleware: ["auth"],
+});
 
 const isLoading = ref(true);
-const favoriteGames = ref([]);
+const favoriteGames = ref<any[]>([]);
 const router = useRouter();
 const auth = getAuth();
 const db = getFirestore();
@@ -170,20 +173,17 @@ const info = ref({
 
 const getFavoriteGames = async () => {
   try {
-    isLoading.value = true; // Yükleme durumu başlatılıyor
-    const userId = auth.currentUser?.uid; // Kullanıcı kimliği alınıyor
+    isLoading.value = true;
+    const userId = auth.currentUser?.uid;
 
-    // Eğer kullanıcı giriş yapmamışsa işlemi durdur
     if (!userId) {
       console.log("Kullanıcı kimliği bulunamadı");
       return;
     }
 
-    // Kullanıcının favori oyunlarını sorgula
     const q = query(colRef, where("userId", "==", userId));
     const querySnapshot = await getDocs(q);
 
-    // Favori oyunları diziye aktarma
     favoriteGames.value = querySnapshot.docs.map((doc) => doc.data().item);
   } catch (error: any) {
     console.log("Hata: ", error.message);
@@ -202,7 +202,6 @@ const removeFromFavorite = async (item: any) => {
       return;
     }
 
-    // Silinecek belgeyi sorgula
     const q = query(
       colRef,
       where("userId", "==", userId),
@@ -210,14 +209,12 @@ const removeFromFavorite = async (item: any) => {
     );
     const querySnapshot = await getDocs(q);
 
-    // Eğer belge varsa sil
     if (!querySnapshot.empty) {
       try {
         isLoading.value = true;
-        const docSnapshot = querySnapshot.docs[0]; // İlk belgeyi al
-        await deleteDoc(docSnapshot.ref); // Firestore'dan belgeyi sil
+        const docSnapshot = querySnapshot.docs[0];
+        await deleteDoc(docSnapshot.ref);
 
-        // Favori oyunları dizisinden de çıkar
         favoriteGames.value = favoriteGames.value.filter(
           (game: any) => game.id !== item.id
         );
@@ -233,19 +230,17 @@ const removeFromFavorite = async (item: any) => {
   } catch (error: any) {
     console.log("Hata: ", error.message);
   } finally {
-    isLoading.value = false; // Yükleme durumu bitiriliyor
+    isLoading.value = false;
   }
 };
 
 onMounted(async () => {
   await nextTick();
   isLoading.value = false;
-  // Kullanıcı oturumu yüklendiğinde getFavoriteGames'i çağır
+
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      getFavoriteGames(); // Kullanıcı giriş yapmışsa favori oyunları getir
-    } else {
-      router.push("/");
+      getFavoriteGames();
     }
   });
 });
