@@ -414,10 +414,14 @@ const setSecondaryGame = (item: any) => {
 };
 
 const goToGame1 = () => {
-  console.log(primaryGame.value.item);
+  primaryGame.value.item?.tags.forEach((tag: any) => {
+    console.log(tag.slug);
+  });
 };
 const goToGame2 = () => {
-  console.log(secondaryGame.value.item);
+  secondaryGame.value.item?.tags.forEach((tag: any) => {
+    console.log(tag.slug);
+  });
 };
 
 const getRandomGame = () => {
@@ -524,7 +528,8 @@ watch(
 .search-results,
 .search-results2 {
   position: absolute;
-  width: 100%;
+  width:100%;
+  max-height: 20rem;
   z-index: 999;
   left: 0;
   overflow-y: auto;
