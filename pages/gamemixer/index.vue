@@ -1,5 +1,7 @@
 <template>
   <Loading v-if="isLoading" />
+
+  <!-- head -->
   <v-row
     v-if="!isLoading"
     class="d-flex justify-space-between align-start mt-2 mt-sm-0 pa-3"
@@ -26,16 +28,22 @@
     />
   </v-row>
 
+  <!-- select games -->
   <v-row class="main-container px-0 px-sm-6 px-md-9 px-lg-12 px-xl-15">
+    <!-- game1 -->
     <v-col cols="5" class="main-container1">
-      <v-card height="40vh" class="rounded-lg d-flex justify-center align-center">
-        <v-card-text v-if="!primaryGame.img" class="text-center text-h5 text-md-h3"
+      <v-card
+        @click="goToGame1"
+        height="40vh"
+        class="rounded-lg d-flex justify-center align-center"
+      >
+        <v-card-text v-if="!primaryGame.item" class="text-center text-h5 text-md-h3"
           >Game 1</v-card-text
         >
         <v-img
-          class="h-100 rounded-lg"
-          v-if="primaryGame.img"
-          :src="primaryGame.img"
+          class="item-image h-100 rounded-lg transition cursor-pointer"
+          v-if="primaryGame.item?.background_image"
+          :src="primaryGame.item?.background_image"
           cover
         />
       </v-card>
@@ -92,30 +100,56 @@
       </div>
     </v-col>
 
+    <!-- mid -->
     <v-col cols="2" class="d-flex flex-column justify-center align-center ga-5">
       <img
+        v-if="!isAnim"
         class="d-flex d-md-none"
-        width="50"
+        width="30"
         src="https://cdn1.iconfinder.com/data/icons/basic-ui-elements-28/512/1034_Add_new_plus_sign-512.png"
       />
       <img
+        v-if="!isAnim"
         class="d-none d-sm-flex"
         width="150"
         src="https://cdn1.iconfinder.com/data/icons/basic-ui-elements-28/512/1034_Add_new_plus_sign-512.png"
       />
+      <img
+        v-if="isAnim"
+        class="anim-img d-none d-sm-flex"
+        width="150"
+        src="https://cdn1.iconfinder.com/data/icons/basic-ui-elements-28/512/1034_Add_new_plus_sign-512.png"
+      />
       <span class="text-caption text-sm-subtitle-1">or try a</span>
-      <v-btn class="rounded-lg transition" variant="outlined" text="random" />
+      <v-btn
+        class="rounded-lg transition"
+        color="cyan"
+        prepend-icon="mdi-magnify"
+        text="random"
+      />
+      <v-btn
+        @click="clear"
+        class="rounded-lg transition"
+        color="error"
+        prepend-icon="mdi-delete"
+        text="clear"
+      />
     </v-col>
 
+    <!-- game2 -->
     <v-col cols="5" class="main-container2">
-      <v-card height="40vh" class="rounded-lg d-flex justify-center align-center">
-        <v-card-text v-if="!secondaryGame.img" class="text-center text-h5 text-md-h3"
+      <v-card
+        @click="goToGame2"
+        height="40vh"
+        class="rounded-lg d-flex justify-center align-center"
+      >
+        <v-card-text v-if="!secondaryGame.item" class="text-center text-h5 text-md-h3"
           >Game 2</v-card-text
         >
         <v-img
-          class="h-100 rounded-lg"
-          v-if="secondaryGame.img"
-          :src="secondaryGame.img"
+          class="item-image2 h-100 rounded-lg transition cursor-pointer"
+          v-if="secondaryGame.item?.background_image"
+          :src="secondaryGame.item?.background_image"
           cover
         />
       </v-card>
@@ -130,6 +164,7 @@
         label="Secondary Game"
         placeholder="Lies of P"
       />
+
       <div class="search-results2 rounded-lg pa-3">
         <v-progress-circular
           v-if="isSmLoading2"
@@ -172,13 +207,104 @@
       </div>
     </v-col>
   </v-row>
+
+  <!-- gameResults -->
+  <v-row v-if="!isAnim && gameResults.length > 0" class="mt-15">
+    <v-col cols="12" class="d-flex justify-space-between align-center">
+      <div class="content-wrapper d-flex justify-center align-center ga-2 cursor-pointer">
+        <h3 class="font-weight-bold text-subtitle-1 text-sm-h5">Results</h3>
+        <v-icon
+          class="right-icon d-none d-sm-flex transition-lg"
+          icon="mdi-chevron-right"
+          size="large"
+        />
+        <v-icon
+          class="right-icon d-flex d-sm-none transition-lg"
+          icon="mdi-chevron-right"
+        />
+      </div>
+
+      <div class="actions-swiper d-flex justify-center align-center ga-2">
+        <div class="newGames-swiper-button-prev pa-2 transition cursor-pointer">
+          <v-icon icon="mdi-chevron-left" size="x-large" color="white" />
+        </div>
+        <div class="newGames-swiper-button-next pa-2 transition cursor-pointer">
+          <v-icon icon="mdi-chevron-right" size="x-large" color="white" />
+        </div>
+      </div>
+    </v-col>
+
+    <v-col cols="12">
+      <swiper
+        :modules="[SwiperFreeMode, SwiperAutoplay, SwiperNavigation]"
+        :freeMode="true"
+        :grab-cursor="true"
+        :navigation="{
+          prevEl: '.newGames-swiper-button-prev',
+          nextEl: '.newGames-swiper-button-next',
+        }"
+        :loop="true"
+        :autoplay="{
+          delay: 3250,
+          disableOnInteraction: false,
+        }"
+        :breakpoints="{
+          '@0.00': {
+            slidesPerView: 1,
+            spaceBetween: 10,
+          },
+          '@0.75': {
+            slidesPerView: 2,
+            spaceBetween: 10,
+          },
+          '@1.00': {
+            slidesPerView: 3,
+            spaceBetween: 20,
+          },
+          1280: {
+            slidesPerView: 4,
+            spaceBetween: 30,
+          },
+          '@1.50': {
+            slidesPerView: 5,
+            spaceBetween: 40,
+          },
+        }"
+        class="mySwiper"
+      >
+        <SwiperSlide
+          class="swiper-slide game-wrapper"
+          v-for="item of gameResults"
+          :key="item?.id"
+          @click="
+            router.push({
+              path: `/allgames/${item.name}`,
+              query: { game: JSON.stringify(item) },
+            })
+          "
+        >
+          <v-img
+            class="image-game transition rounded-xl transition cursor-pointer"
+            :src="item?.background_image"
+            height="350"
+            cover
+          />
+          <div class="content-game pa-3 rounded-lg">
+            <h3 class="text-subtitle-2 text-white text-xl-subtitle-1">{{ item.name }}</h3>
+          </div>
+        </SwiperSlide>
+      </swiper>
+    </v-col>
+  </v-row>
 </template>
+
 <script lang="ts" setup>
 definePageMeta({
   layout: "single-game",
 });
 
 const isLoading = ref(false);
+const isAnim = ref(false);
 const router = useRouter();
 const isSmLoading = ref(false);
 const isSmLoading2 = ref(false);
@@ -187,14 +313,17 @@ const models = ref({
   primaryGame: "",
   secondaryGame: "",
 });
-const gamesFoundPrimary = ref<any[]>([]);
-const gamesFoundSecondary = ref<any[]>([]);
 const primaryGame = ref({
+  item: null,
   img: null,
 });
 const secondaryGame = ref({
+  item: null,
   img: null,
 });
+const gamesFoundPrimary = ref<any[]>([]);
+const gamesFoundSecondary = ref<any[]>([]);
+const gameResults = ref<any[]>([]);
 
 const searchGame = async () => {
   try {
@@ -240,7 +369,7 @@ const searchGame2 = async () => {
 
 const setPrimaryGame = (item: any) => {
   isSmLoading.value = false;
-  primaryGame.value.img = item.background_image;
+  primaryGame.value.item = item;
 
   gamesFoundPrimary.value = [];
   models.value.primaryGame = "";
@@ -248,11 +377,101 @@ const setPrimaryGame = (item: any) => {
 
 const setSecondaryGame = (item: any) => {
   isSmLoading2.value = false;
-  secondaryGame.value.img = item.background_image;
+  secondaryGame.value.item = item;
 
   gamesFoundSecondary.value = [];
   models.value.secondaryGame = "";
 };
+
+const goToGame1 = () => {
+  console.log(primaryGame.value.item);
+};
+const goToGame2 = () => {
+  console.log(secondaryGame.value.item);
+};
+
+const findGamesWithCommonTags = async () => {
+  const primaryTags = primaryGame.value.item?.tags.map((tag: any) => tag.slug) || [];
+  const secondaryTags = secondaryGame.value.item?.tags.map((tag: any) => tag.slug) || [];
+  const primaryGenres = primaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
+  const secondaryGenres = secondaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
+
+  // Ortak tag'leri bulalım
+  const commonTags = primaryTags.filter((tag: string) => secondaryTags.includes(tag));
+  const commonGenres = primaryGenres.filter((genre: string) => secondaryGenres.includes(genre));
+
+  isAnim.value = true;
+
+  try {
+    let data;
+
+    if (commonTags.length >= 2) {
+      // En az iki ortak tag'e göre oyun araması
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          tags: commonTags.join(","),
+          page_size: 20,
+        },
+      });
+    } else if (commonTags.length === 1) {
+      // Bir ortak tag'e göre oyun araması
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          tags: commonTags[0],
+          page_size: 20,
+        },
+      });
+    } else if (commonGenres.length > 0) {
+      // Ortak oyun türüne göre oyun araması
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          genres: commonGenres.join(","),
+          page_size: 20,
+        },
+      });
+    } else {
+      // Rastgele oyun araması
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          page_size: 20,
+          ordering: "-added", // Yeni eklenen oyunları getir
+        },
+      });
+    }
+
+    // Sonuçları `gameResults` dizisine aktaralım
+    gameResults.value = data.results || [];
+
+    // Eğer hiçbir oyun bulunamadıysa, kullanıcıya bilgi verelim
+    if (gameResults.value.length === 0) {
+      console.log("Aramanızla eşleşen oyun bulunamadı.");
+    }
+  } catch (error: any) {
+    console.log("API Error: ", error.message);
+  } finally {
+    isAnim.value = false;
+  }
+};
+
+
+const clear = () => {
+  primaryGame.value.item = null;
+  secondaryGame.value.item = null;
+  gameResults.value = [];
+};
+
+watch(
+  [() => primaryGame.value.item, () => secondaryGame.value.item],
+  ([newPrimary, newSecondary]) => {
+    if (newPrimary && newSecondary) {
+      findGamesWithCommonTags(); // İki item de doluysa fonksiyonu çalıştır
+    }
+  }
+);
 </script>
 
 <style scoped>
@@ -289,6 +508,16 @@ const setSecondaryGame = (item: any) => {
   scrollbar-color: #1a2537 #f0e8e8;
   scroll-behavior: smooth;
 }
+.item-image:hover {
+  overflow: hidden;
+  filter: brightness(0.7);
+  scale: 1.05;
+}
+.item-image2:hover {
+  overflow: hidden;
+  filter: brightness(0.7);
+  scale: 1.05;
+}
 .game {
   background-color: rgba(255, 255, 255, 0.2);
 }
@@ -304,5 +533,59 @@ const setSecondaryGame = (item: any) => {
 }
 .game:hover .game-date {
   color: #00e5ff;
+}
+
+.swiper-slide {
+  position: relative;
+}
+.content-game {
+  background: rgba(0, 162, 255, 0.3);
+  position: absolute;
+  bottom: 5%;
+  left: 3%;
+  z-index: 99;
+}
+.custom-swiper-button-prev {
+  left: 1%;
+}
+.custom-swiper-button-next {
+  right: 1%;
+}
+.custom-swiper-button-prev:hover {
+  background-color: rgba(0, 204, 255, 0.5);
+}
+.custom-swiper-button-next:hover {
+  background-color: rgba(0, 204, 255, 0.5);
+}
+.newGames-swiper-button-prev,
+.newGames-swiper-button-next {
+  border-radius: 50%;
+  background-color: rgba(0, 204, 255, 0.3);
+}
+.newGames-swiper-button-prev:hover {
+  background-color: rgba(0, 204, 255, 0.7);
+}
+.newGames-swiper-button-next:hover {
+  background-color: rgba(0, 204, 255, 0.7);
+}
+.content-wrapper:hover .right-icon {
+  margin-left: 0.5rem;
+}
+.game-wrapper:hover .image-game {
+  transform: scale(1.02);
+  filter: brightness(0.5);
+}
+
+.anim-img {
+  animation: rotate360 2s linear infinite;
+}
+
+@keyframes rotate360 {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
