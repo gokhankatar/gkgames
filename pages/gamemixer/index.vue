@@ -50,7 +50,7 @@
     class="main-container px-0 px-sm-6 px-md-9 px-lg-12 px-xl-15 d-flex justify-center align-center"
   >
     <!-- game1 -->
-    <v-col cols="12" sm="5" md="3" class="main-container1">
+    <v-col cols="12" sm="5" md="3" lg="4" class="main-container1">
       <v-card
         @click="goToGame1"
         height="40vh"
@@ -163,7 +163,7 @@
     </v-col>
 
     <!-- game2 -->
-    <v-col cols="12" sm="5" md="3" class="main-container2">
+    <v-col cols="12" sm="5" md="3" lg="4" class="main-container2">
       <v-card
         @click="goToGame2"
         height="40vh"
@@ -429,24 +429,88 @@ const getRandomGame = () => {
 };
 
 const findGamesWithCommonTags = async () => {
+  let horrorTags = ["horror", "zombies", "zombi-2"];
+  let souls = ["souls-like"];
+  let rougeLike = ["rouge-like"]; // Rouge-like türü eklendi
+  let sports = ["basketball", "football", "soccer", "gambling"];
+  let shooter = ["third-person-shooter", "military", "war", "hero-shooter-2", "shooter"];
+  let indi = ["indi-2", "2d", "3d-platformer-2", "parkour", "parkour-2"];
+
   const primaryTags = primaryGame.value.item?.tags.map((tag: any) => tag.slug) || [];
   const secondaryTags = secondaryGame.value.item?.tags.map((tag: any) => tag.slug) || [];
-  const primaryGenres =
-    primaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
-  const secondaryGenres =
-    secondaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
+  const primaryGenres = primaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
+  const secondaryGenres = secondaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
 
   const commonTags = primaryTags.filter((tag: string) => secondaryTags.includes(tag));
   const commonGenres = primaryGenres.filter((genre: string) =>
     secondaryGenres.includes(genre)
   );
 
+  const hasCommonTagsWithCategory = (categoryTags: string[], tags: string[]) => {
+    return categoryTags.some((tag) => tags.includes(tag));
+  };
+
   isAnim.value = true;
 
   try {
     let data;
 
-    if (commonTags.length >= 2) {
+    // Tag eşleşmeleriyle oyunları bul
+    if (hasCommonTagsWithCategory(horrorTags, commonTags)) {
+      console.log("Horror türü eşleşti.");
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          tags: horrorTags.join(","),
+          page_size: 20,
+        },
+      });
+    } else if (hasCommonTagsWithCategory(souls, commonTags)) {
+      console.log("Souls-like türü eşleşti.");
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          tags: souls.join(","),
+          page_size: 20,
+        },
+      });
+    } else if (hasCommonTagsWithCategory(rougeLike, commonTags)) {
+      console.log("Rouge-like türü eşleşti.");
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          tags: rougeLike.join(","),
+          page_size: 20,
+        },
+      });
+    } else if (hasCommonTagsWithCategory(sports, commonTags)) {
+      console.log("Sports türü eşleşti.");
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          tags: sports.join(","),
+          page_size: 20,
+        },
+      });
+    } else if (hasCommonTagsWithCategory(shooter, commonTags)) {
+      console.log("Shooter türü eşleşti.");
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          tags: shooter.join(","),
+          page_size: 20,
+        },
+      });
+    } else if (hasCommonTagsWithCategory(indi, commonTags)) {
+      console.log("Indie türü eşleşti.");
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          tags: indi.join(","),
+          page_size: 20,
+        },
+      });
+    } else if (commonTags.length >= 2) {
       data = await $fetch("https://api.rawg.io/api/games", {
         params: {
           key: api_key,
@@ -483,7 +547,7 @@ const findGamesWithCommonTags = async () => {
     gameResults.value = data.results || [];
 
     if (gameResults.value.length === 0) {
-      console.log("Not founded!");
+      console.log("Oyun bulunamadı!");
     }
   } catch (error: any) {
     console.log(error.message);
@@ -491,6 +555,7 @@ const findGamesWithCommonTags = async () => {
     isAnim.value = false;
   }
 };
+
 
 const clear = () => {
   primaryGame.value.item = null;
@@ -528,7 +593,7 @@ watch(
 .search-results,
 .search-results2 {
   position: absolute;
-  width:100%;
+  width: 100%;
   max-height: 20rem;
   z-index: 999;
   left: 0;
