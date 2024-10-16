@@ -332,7 +332,11 @@ const checkIfFavorite = async () => {
 
 const handleFavorite = async () => {
   const userId = auth.currentUser?.uid;
-  if (!userId || !game.value) return;
+  if (!userId || !game.value) {
+    info.value.msg = "You should login";
+    info.value.state = "error";
+    isInfo.value = true;
+  }
 
   const docRef = doc(colRef, `${userId}_${game.value.id}`);
 

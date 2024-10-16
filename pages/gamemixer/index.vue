@@ -29,9 +29,28 @@
   </v-row>
 
   <!-- select games -->
-  <v-row class="main-container px-0 px-sm-6 px-md-9 px-lg-12 px-xl-15">
+  <v-row class="d-flex d-sm-none justify-center align-center ga-3 my-2">
+    <v-btn
+      @click="getRandomGame"
+      class="rounded-lg transition"
+      color="cyan"
+      prepend-icon="mdi-magnify"
+      text="random"
+    />
+    <v-btn
+      @click="clear"
+      class="rounded-lg transition"
+      color="error"
+      prepend-icon="mdi-delete"
+      text="clear"
+    />
+  </v-row>
+
+  <v-row
+    class="main-container px-0 px-sm-6 px-md-9 px-lg-12 px-xl-15 d-flex justify-center align-center"
+  >
     <!-- game1 -->
-    <v-col cols="5" class="main-container1">
+    <v-col cols="12" sm="5" md="3" class="main-container1">
       <v-card
         @click="goToGame1"
         height="40vh"
@@ -101,11 +120,11 @@
     </v-col>
 
     <!-- mid -->
-    <v-col cols="2" class="d-flex flex-column justify-center align-center ga-5">
+    <v-col cols="12" lg="2" class="d-flex flex-column justify-center align-center ga-5">
       <img
         v-if="!isAnim"
-        class="d-flex d-md-none"
-        width="30"
+        class="d-flex d-sm-none"
+        width="50"
         src="https://cdn1.iconfinder.com/data/icons/basic-ui-elements-28/512/1034_Add_new_plus_sign-512.png"
       />
       <img
@@ -120,16 +139,23 @@
         width="150"
         src="https://cdn1.iconfinder.com/data/icons/basic-ui-elements-28/512/1034_Add_new_plus_sign-512.png"
       />
-      <span class="text-caption text-sm-subtitle-1">or try a</span>
+      <img
+        v-if="isAnim"
+        class="anim-img d-flex d-sm-none"
+        width="50"
+        src="https://cdn1.iconfinder.com/data/icons/basic-ui-elements-28/512/1034_Add_new_plus_sign-512.png"
+      />
+      <span class="d-none d-sm-flex text-caption text-sm-subtitle-1">or try a</span>
       <v-btn
-        class="rounded-lg transition"
+        @click="getRandomGame"
+        class="d-none d-sm-flex rounded-lg transition"
         color="cyan"
         prepend-icon="mdi-magnify"
         text="random"
       />
       <v-btn
         @click="clear"
-        class="rounded-lg transition"
+        class="d-none d-sm-flex rounded-lg transition"
         color="error"
         prepend-icon="mdi-delete"
         text="clear"
@@ -137,7 +163,7 @@
     </v-col>
 
     <!-- game2 -->
-    <v-col cols="5" class="main-container2">
+    <v-col cols="12" sm="5" md="3" class="main-container2">
       <v-card
         @click="goToGame2"
         height="40vh"
@@ -209,7 +235,7 @@
   </v-row>
 
   <!-- gameResults -->
-  <v-row v-if="!isAnim && gameResults.length > 0" class="mt-15">
+  <v-row v-if="!isAnim && gameResults.length > 0" class="mt-15 mb-5">
     <v-col cols="12" class="d-flex justify-space-between align-center">
       <div class="content-wrapper d-flex justify-center align-center ga-2 cursor-pointer">
         <h3 class="font-weight-bold text-subtitle-1 text-sm-h5">Results</h3>
@@ -290,12 +316,16 @@
             cover
           />
           <div class="content-game pa-3 rounded-lg">
-            <h3 class="text-subtitle-2 text-white text-xl-subtitle-1">{{ item.name }}</h3>
+            <h3 class="text-subtitle-2 text-white text-xl-subtitle-1">
+              {{ item.name }}
+            </h3>
           </div>
         </SwiperSlide>
       </swiper>
     </v-col>
   </v-row>
+
+  <v-responsive v-if="gameResults.length === 0" class="d-flex d-sm-none" height="350" />
 </template>
 
 <script lang="ts" setup>
@@ -390,15 +420,22 @@ const goToGame2 = () => {
   console.log(secondaryGame.value.item);
 };
 
+const getRandomGame = () => {
+  // todo
+};
+
 const findGamesWithCommonTags = async () => {
   const primaryTags = primaryGame.value.item?.tags.map((tag: any) => tag.slug) || [];
   const secondaryTags = secondaryGame.value.item?.tags.map((tag: any) => tag.slug) || [];
-  const primaryGenres = primaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
-  const secondaryGenres = secondaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
+  const primaryGenres =
+    primaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
+  const secondaryGenres =
+    secondaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
 
-  // Ortak tag'leri bulalım
   const commonTags = primaryTags.filter((tag: string) => secondaryTags.includes(tag));
-  const commonGenres = primaryGenres.filter((genre: string) => secondaryGenres.includes(genre));
+  const commonGenres = primaryGenres.filter((genre: string) =>
+    secondaryGenres.includes(genre)
+  );
 
   isAnim.value = true;
 
@@ -406,7 +443,6 @@ const findGamesWithCommonTags = async () => {
     let data;
 
     if (commonTags.length >= 2) {
-      // En az iki ortak tag'e göre oyun araması
       data = await $fetch("https://api.rawg.io/api/games", {
         params: {
           key: api_key,
@@ -415,7 +451,6 @@ const findGamesWithCommonTags = async () => {
         },
       });
     } else if (commonTags.length === 1) {
-      // Bir ortak tag'e göre oyun araması
       data = await $fetch("https://api.rawg.io/api/games", {
         params: {
           key: api_key,
@@ -424,7 +459,6 @@ const findGamesWithCommonTags = async () => {
         },
       });
     } else if (commonGenres.length > 0) {
-      // Ortak oyun türüne göre oyun araması
       data = await $fetch("https://api.rawg.io/api/games", {
         params: {
           key: api_key,
@@ -433,30 +467,26 @@ const findGamesWithCommonTags = async () => {
         },
       });
     } else {
-      // Rastgele oyun araması
       data = await $fetch("https://api.rawg.io/api/games", {
         params: {
           key: api_key,
           page_size: 20,
-          ordering: "-added", // Yeni eklenen oyunları getir
+          ordering: "-added",
         },
       });
     }
 
-    // Sonuçları `gameResults` dizisine aktaralım
     gameResults.value = data.results || [];
 
-    // Eğer hiçbir oyun bulunamadıysa, kullanıcıya bilgi verelim
     if (gameResults.value.length === 0) {
-      console.log("Aramanızla eşleşen oyun bulunamadı.");
+      console.log("Not founded!");
     }
   } catch (error: any) {
-    console.log("API Error: ", error.message);
+    console.log(error.message);
   } finally {
     isAnim.value = false;
   }
 };
-
 
 const clear = () => {
   primaryGame.value.item = null;
@@ -468,7 +498,7 @@ watch(
   [() => primaryGame.value.item, () => secondaryGame.value.item],
   ([newPrimary, newSecondary]) => {
     if (newPrimary && newSecondary) {
-      findGamesWithCommonTags(); // İki item de doluysa fonksiyonu çalıştır
+      findGamesWithCommonTags();
     }
   }
 );
@@ -476,7 +506,6 @@ watch(
 
 <style scoped>
 @import url(/assets/css/main.css);
-
 .main-container1,
 .main-container2 {
   position: relative;
@@ -498,6 +527,7 @@ watch(
   width: 100%;
   z-index: 999;
   left: 0;
+  overflow-y: auto;
 }
 .search-wrapper,
 .search-wrapper2 {

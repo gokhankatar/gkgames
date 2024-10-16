@@ -5,4 +5,5 @@
 # frontend
 
 - form da kayıt için iki kere parola onayı al.
-- game-mixer yap.
+- oyunlarda resmi olmayan oyunlar için src degistir
+- game-mixer (router guard olsun)
