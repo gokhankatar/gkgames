@@ -431,15 +431,17 @@ const getRandomGame = () => {
 const findGamesWithCommonTags = async () => {
   let horrorTags = ["horror", "zombies", "zombi-2"];
   let souls = ["souls-like"];
-  let rougeLike = ["rouge-like"]; // Rouge-like türü eklendi
+  let rougeLike = ["rougelike"];
   let sports = ["basketball", "football", "soccer", "gambling"];
   let shooter = ["third-person-shooter", "military", "war", "hero-shooter-2", "shooter"];
   let indi = ["indi-2", "2d", "3d-platformer-2", "parkour", "parkour-2"];
 
   const primaryTags = primaryGame.value.item?.tags.map((tag: any) => tag.slug) || [];
   const secondaryTags = secondaryGame.value.item?.tags.map((tag: any) => tag.slug) || [];
-  const primaryGenres = primaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
-  const secondaryGenres = secondaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
+  const primaryGenres =
+    primaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
+  const secondaryGenres =
+    secondaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
 
   const commonTags = primaryTags.filter((tag: string) => secondaryTags.includes(tag));
   const commonGenres = primaryGenres.filter((genre: string) =>
@@ -555,7 +557,6 @@ const findGamesWithCommonTags = async () => {
     isAnim.value = false;
   }
 };
-
 
 const clear = () => {
   primaryGame.value.item = null;
