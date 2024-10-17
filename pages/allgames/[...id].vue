@@ -252,20 +252,6 @@ onMounted(async () => {
         <v-icon icon="mdi-trophy" />
       </div>
 
-      <!-- stores -->
-      <div v-if="game.stores" class="d-flex justify-start align-center ga-5">
-        <span class="text-grey">Stores: </span>
-        <v-chip
-          color="cyan"
-          v-for="store of game?.stores"
-          :href="`https://${store.store.domain}`"
-          target="_blank"
-          class="store-text d-inline transition text-subtitle-2 text-sm-subtitle-1"
-        >
-          {{ store.store.name }}
-        </v-chip>
-      </div>
-
       <!-- platforms -->
       <div v-if="game.parent_platforms" class="d-flex justify-start align-center ga-5">
         <span class="text-grey">Platforms: </span>
@@ -321,6 +307,20 @@ onMounted(async () => {
             />
           </span>
         </div>
+      </div>
+
+      <!-- stores -->
+      <div v-if="game.stores" class="d-flex justify-start align-center ga-5">
+        <span class="text-grey">Stores: </span>
+        <v-chip
+          color="cyan"
+          v-for="store of game?.stores"
+          :href="`https://${store.store.domain}`"
+          target="_blank"
+          class="store-text d-inline transition text-subtitle-2 text-sm-subtitle-1"
+        >
+          {{ store.store.name }}
+        </v-chip>
       </div>
 
       <!-- tags -->
