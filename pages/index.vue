@@ -23,7 +23,7 @@ const getNews = async () => {
   try {
     isLoading.value = true;
     const data = await $fetch(
-      `https://newsapi.org/v2/everything?q=gaming&apiKey=${api_key}`
+      `https://gnews.io/api/v4/search?q=gaming&lang=tr&token=${api_key}`
     );
     newsArr.value = data?.articles ?? [];
 
@@ -154,8 +154,8 @@ onMounted(async () => {
           <v-img
             class="image rounded-lg"
             :src="
-              item.urlToImage
-                ? item.urlToImage
+              item.image
+                ? item.image
                 : 'https://media.istockphoto.com/id/1334436084/tr/foto%C4%9Fraf/top-down-view-of-colorful-illuminated-gaming-accessories-laying-on-table.jpg?s=612x612&w=0&k=20&c=RefVtIFV7L-nNysTPo3JulhNcw2eAmm6sF0kARa6D9o='
             "
             height="70vh"
