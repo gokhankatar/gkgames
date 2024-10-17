@@ -48,10 +48,6 @@
 
 <img src="/assets/screenshots/mobileView.png" />
 
-## Tablet View
-
-<img src="" />
-
 ## See On Live
 
 <a href="https://gkgames.vercel.app" target="_blank">Link</a>
