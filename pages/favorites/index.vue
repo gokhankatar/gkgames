@@ -1,3 +1,108 @@
+<script lang="ts" setup>
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import {
+  getFirestore,
+  query,
+  collection,
+  where,
+  getDocs,
+  deleteDoc,
+} from "firebase/firestore";
+
+useHead({
+  title: "GKGames - Favorites",
+});
+definePageMeta({
+  middleware: ["auth"],
+});
+
+const isLoading = ref(true);
+const favoriteGames = ref<any[]>([]);
+const router = useRouter();
+const auth = getAuth();
+const db = getFirestore();
+const colRef = collection(db, "favorites");
+const isInfo = ref(false);
+const info = ref({
+  msg: "",
+  state: "",
+});
+
+const getFavoriteGames = async () => {
+  try {
+    isLoading.value = true;
+    const userId = auth.currentUser?.uid;
+
+    if (!userId) {
+      console.log("Kullanıcı kimliği bulunamadı");
+      return;
+    }
+
+    const q = query(colRef, where("userId", "==", userId));
+    const querySnapshot = await getDocs(q);
+
+    favoriteGames.value = querySnapshot.docs.map((doc) => doc.data().item);
+  } catch (error: any) {
+    console.log("Hata: ", error.message);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const removeFromFavorite = async (item: any) => {
+  try {
+    isLoading.value = true;
+    const userId = auth.currentUser?.uid;
+
+    if (!userId) {
+      console.log("Kullanıcı kimliği bulunamadı");
+      return;
+    }
+
+    const q = query(
+      colRef,
+      where("userId", "==", userId),
+      where("item.id", "==", item.id)
+    );
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      try {
+        isLoading.value = true;
+        const docSnapshot = querySnapshot.docs[0];
+        await deleteDoc(docSnapshot.ref);
+
+        favoriteGames.value = favoriteGames.value.filter(
+          (game: any) => game.id !== item.id
+        );
+        info.value.msg = "This game deleted from your favorite list";
+        info.value.state = "error";
+        isInfo.value = true;
+      } catch (error: any) {
+        console.log(error.message);
+      } finally {
+        isLoading.value = false;
+      }
+    }
+  } catch (error: any) {
+    console.log("Hata: ", error.message);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+onMounted(async () => {
+  await nextTick();
+  isLoading.value = false;
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      getFavoriteGames();
+    }
+  });
+});
+</script>
+
 <template>
   <Loading v-if="isLoading" />
 
@@ -141,110 +246,7 @@
     >{{ info.msg }}</v-snackbar
   >
 </template>
-<script lang="ts" setup>
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import {
-  getFirestore,
-  query,
-  collection,
-  where,
-  getDocs,
-  deleteDoc,
-} from "firebase/firestore";
 
-useHead({
-  title: "GKGames - Favorites",
-});
-definePageMeta({
-  middleware: ["auth"],
-});
-
-const isLoading = ref(true);
-const favoriteGames = ref<any[]>([]);
-const router = useRouter();
-const auth = getAuth();
-const db = getFirestore();
-const colRef = collection(db, "favorites");
-const isInfo = ref(false);
-const info = ref({
-  msg: "",
-  state: "",
-});
-
-const getFavoriteGames = async () => {
-  try {
-    isLoading.value = true;
-    const userId = auth.currentUser?.uid;
-
-    if (!userId) {
-      console.log("Kullanıcı kimliği bulunamadı");
-      return;
-    }
-
-    const q = query(colRef, where("userId", "==", userId));
-    const querySnapshot = await getDocs(q);
-
-    favoriteGames.value = querySnapshot.docs.map((doc) => doc.data().item);
-  } catch (error: any) {
-    console.log("Hata: ", error.message);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const removeFromFavorite = async (item: any) => {
-  try {
-    isLoading.value = true;
-    const userId = auth.currentUser?.uid;
-
-    if (!userId) {
-      console.log("Kullanıcı kimliği bulunamadı");
-      return;
-    }
-
-    const q = query(
-      colRef,
-      where("userId", "==", userId),
-      where("item.id", "==", item.id)
-    );
-    const querySnapshot = await getDocs(q);
-
-    if (!querySnapshot.empty) {
-      try {
-        isLoading.value = true;
-        const docSnapshot = querySnapshot.docs[0];
-        await deleteDoc(docSnapshot.ref);
-
-        favoriteGames.value = favoriteGames.value.filter(
-          (game: any) => game.id !== item.id
-        );
-        info.value.msg = "This game deleted from your favorite list";
-        info.value.state = "error";
-        isInfo.value = true;
-      } catch (error: any) {
-        console.log(error.message);
-      } finally {
-        isLoading.value = false;
-      }
-    }
-  } catch (error: any) {
-    console.log("Hata: ", error.message);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-onMounted(async () => {
-  await nextTick();
-  isLoading.value = false;
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      getFavoriteGames();
-    }
-  });
-});
-</script>
 <style scoped>
 .game-wrapper {
   position: relative;

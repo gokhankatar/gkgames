@@ -1,3 +1,110 @@
+<script lang="ts" setup>
+import { Mousewheel } from "swiper/modules";
+import imgNull from "~/assets/img/imgNull.jpg";
+
+const isLoading = ref(true);
+const router = useRouter();
+const newsArr = ref<any[]>([]);
+const bestGamesArr = ref<any[]>([]);
+const popularGamesArr = ref<any[]>([]);
+const randomNews = ref<any[]>([]);
+const newGames = ref<any[]>([]);
+const api_key = useRuntimeConfig().app.apiKeyNews;
+const apiKey = useRuntimeConfig().app.apiKey;
+
+const selectRandomNews = (list: Ref<any[]>, num: number) => {
+  if (list.value.length > 0) {
+    const shuffled = list.value.sort(() => 0.5 - Math.random());
+    randomNews.value = shuffled.slice(0, num);
+  }
+};
+
+const getNews = async () => {
+  try {
+    isLoading.value = true;
+    const data = await $fetch(
+      `https://newsapi.org/v2/everything?q=gaming&apiKey=${api_key}`
+    );
+    newsArr.value = data?.articles ?? [];
+
+    selectRandomNews(newsArr, 10);
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const openToNews = (item: any) => {
+  const url = item.url;
+  window.open(url, "_blank");
+};
+
+const getNewGames = async () => {
+  try {
+    isLoading.value = true;
+
+    const currentDate = new Date().toISOString().slice(0, 10);
+    const endDate = new Date();
+    endDate.setFullYear(endDate.getFullYear() + 1);
+    const formattedEndDate = endDate.toISOString().slice(0, 10);
+
+    const url = `https://api.rawg.io/api/games?key=${apiKey}&dates=${currentDate},${formattedEndDate}&ordering=released`;
+    const data = await $fetch(url);
+
+    newGames.value = data?.results?.filter((game: any) => {
+      return !game.tags?.some((tag: any) => tag.name.toLowerCase() === "nudity");
+    });
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const getBestGames = async () => {
+  try {
+    isLoading.value = true;
+    const url = `https://api.rawg.io/api/games?key=${apiKey}&ordering=-metacritic`;
+    const data = await $fetch(url);
+    bestGamesArr.value = data?.results;
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const getPopularGames = async () => {
+  try {
+    isLoading.value = true;
+    const url = `https://api.rawg.io/api/games?ordering=-added&key=${apiKey}`;
+    const data = await $fetch(url);
+    popularGamesArr.value = data?.results;
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const truncateText = (text: string, length: number) => {
+  if (text.length <= length) {
+    return text;
+  }
+  return text.substring(0, length) + "...";
+};
+
+onMounted(async () => {
+  await nextTick();
+  isLoading.value = false;
+  getNews();
+  getNewGames();
+  getBestGames();
+  getPopularGames();
+});
+</script>
+
 <template>
   <Loading v-if="isLoading" />
 
@@ -169,7 +276,7 @@
         >
           <v-img
             class="image-game transition rounded-xl transition cursor-pointer"
-            :src="item?.background_image"
+            :src="item.background_image ? item.background_image : imgNull"
             height="350"
             cover
           />
@@ -258,7 +365,7 @@
         >
           <v-img
             class="image-game transition rounded-xl transition cursor-pointer"
-            :src="item?.background_image"
+            :src="item.background_image ? item.background_image : imgNull"
             height="350"
             cover
           />
@@ -347,7 +454,7 @@
         >
           <v-img
             class="image-game transition rounded-xl transition cursor-pointer"
-            :src="item?.background_image"
+            :src="item.background_image ? item.background_image : imgNull"
             height="350"
             cover
           />
@@ -359,112 +466,6 @@
     </v-col>
   </v-row>
 </template>
-
-<script lang="ts" setup>
-import { Mousewheel } from "swiper/modules";
-
-const isLoading = ref(true);
-const router = useRouter();
-const newsArr = ref<any[]>([]);
-const bestGamesArr = ref<any[]>([]);
-const popularGamesArr = ref<any[]>([]);
-const randomNews = ref<any[]>([]);
-const newGames = ref<any[]>([]);
-const api_key = useRuntimeConfig().app.apiKeyNews;
-const apiKey = useRuntimeConfig().app.apiKey;
-
-const selectRandomNews = (list: Ref<any[]>, num: number) => {
-  if (list.value.length > 0) {
-    const shuffled = list.value.sort(() => 0.5 - Math.random());
-    randomNews.value = shuffled.slice(0, num);
-  }
-};
-
-const getNews = async () => {
-  try {
-    isLoading.value = true;
-    const data = await $fetch(
-      `https://newsapi.org/v2/everything?q=gaming&apiKey=${api_key}`
-    );
-    newsArr.value = data?.articles ?? [];
-
-    selectRandomNews(newsArr, 10);
-  } catch (error: any) {
-    console.log(error.message);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const openToNews = (item: any) => {
-  const url = item.url;
-  window.open(url, "_blank");
-};
-
-const getNewGames = async () => {
-  try {
-    isLoading.value = true;
-
-    const currentDate = new Date().toISOString().slice(0, 10);
-    const endDate = new Date();
-    endDate.setFullYear(endDate.getFullYear() + 1);
-    const formattedEndDate = endDate.toISOString().slice(0, 10);
-
-    const url = `https://api.rawg.io/api/games?key=${apiKey}&dates=${currentDate},${formattedEndDate}&ordering=released`;
-    const data = await $fetch(url);
-
-    newGames.value = data?.results?.filter((game: any) => {
-      return !game.tags?.some((tag: any) => tag.name.toLowerCase() === "nudity");
-    });
-  } catch (error: any) {
-    console.log(error.message);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const getBestGames = async () => {
-  try {
-    isLoading.value = true;
-    const url = `https://api.rawg.io/api/games?key=${apiKey}&ordering=-metacritic`;
-    const data = await $fetch(url);
-    bestGamesArr.value = data?.results;
-  } catch (error: any) {
-    console.log(error.message);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const getPopularGames = async () => {
-  try {
-    isLoading.value = true;
-    const url = `https://api.rawg.io/api/games?ordering=-added&key=${apiKey}`;
-    const data = await $fetch(url);
-    popularGamesArr.value = data?.results;
-  } catch (error: any) {
-    console.log(error.message);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const truncateText = (text: string, length: number) => {
-  if (text.length <= length) {
-    return text;
-  }
-  return text.substring(0, length) + "...";
-};
-
-onMounted(async () => {
-  await nextTick();
-  isLoading.value = false;
-  getNews();
-  getNewGames();
-  getBestGames();
-  getPopularGames();
-});
-</script>
 
 <style scoped>
 @import url(/assets/css/main.css);

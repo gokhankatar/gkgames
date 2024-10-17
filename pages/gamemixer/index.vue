@@ -1,3 +1,233 @@
+<script lang="ts" setup>
+definePageMeta({
+  layout: "single-game",
+  middleware: ["auth"],
+});
+const isLoading = ref(false);
+const isAnim = ref(false);
+const router = useRouter();
+const isSmLoading = ref(false);
+const isSmLoading2 = ref(false);
+const api_key = useRuntimeConfig().app.apiKey;
+const models = ref({
+  primaryGame: "",
+  secondaryGame: "",
+});
+const primaryGame = ref({
+  item: null,
+  img: null,
+});
+const secondaryGame = ref({
+  item: null,
+  img: null,
+});
+const gamesFoundPrimary = ref<any[]>([]);
+const gamesFoundSecondary = ref<any[]>([]);
+const gameResults = ref<any[]>([]);
+
+const searchGame = async () => {
+  try {
+    if (models.value.primaryGame.length > 2) {
+      isSmLoading.value = true;
+      const data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          search: models.value.primaryGame,
+        },
+      });
+      gamesFoundPrimary.value = data?.results;
+    } else {
+      gamesFoundPrimary.value = [];
+    }
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    isSmLoading.value = false;
+  }
+};
+
+const searchGame2 = async () => {
+  try {
+    if (models.value.secondaryGame.length > 2) {
+      isSmLoading2.value = true;
+      const data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          search: models.value.secondaryGame,
+        },
+      });
+      gamesFoundSecondary.value = data?.results;
+    } else {
+      gamesFoundSecondary.value = [];
+    }
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    isSmLoading2.value = false;
+  }
+};
+
+const setPrimaryGame = (item: any) => {
+  isSmLoading.value = false;
+  primaryGame.value.item = item;
+
+  gamesFoundPrimary.value = [];
+  models.value.primaryGame = "";
+};
+
+const setSecondaryGame = (item: any) => {
+  isSmLoading2.value = false;
+  secondaryGame.value.item = item;
+
+  gamesFoundSecondary.value = [];
+  models.value.secondaryGame = "";
+};
+
+const findGamesWithCommonTags = async () => {
+  let horrorTags = ["horror", "zombies", "zombi-2"];
+  let souls = ["souls-like"];
+  let rougeLike = ["rougelike"];
+  let sports = ["basketball", "football", "soccer", "gambling"];
+  let shooter = ["third-person-shooter", "military", "war", "hero-shooter-2", "shooter"];
+  let indi = ["indi-2", "2d", "3d-platformer-2", "parkour", "parkour-2"];
+
+  const primaryTags = primaryGame.value.item?.tags.map((tag: any) => tag.slug) || [];
+  const secondaryTags = secondaryGame.value.item?.tags.map((tag: any) => tag.slug) || [];
+  const primaryGenres =
+    primaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
+  const secondaryGenres =
+    secondaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
+
+  const commonTags = primaryTags.filter((tag: string) => secondaryTags.includes(tag));
+  const commonGenres = primaryGenres.filter((genre: string) =>
+    secondaryGenres.includes(genre)
+  );
+
+  const hasCommonTagsWithCategory = (categoryTags: string[], tags: string[]) => {
+    return categoryTags.some((tag) => tags.includes(tag));
+  };
+
+  isAnim.value = true;
+
+  try {
+    let data;
+
+    if (hasCommonTagsWithCategory(horrorTags, commonTags)) {
+      console.log("Horror türü eşleşti.");
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          tags: horrorTags.join(","),
+          page_size: 20,
+        },
+      });
+    } else if (hasCommonTagsWithCategory(souls, commonTags)) {
+      console.log("Souls-like türü eşleşti.");
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          tags: souls.join(","),
+          page_size: 20,
+        },
+      });
+    } else if (hasCommonTagsWithCategory(rougeLike, commonTags)) {
+      console.log("Rouge-like türü eşleşti.");
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          tags: rougeLike.join(","),
+          page_size: 20,
+        },
+      });
+    } else if (hasCommonTagsWithCategory(sports, commonTags)) {
+      console.log("Sports türü eşleşti.");
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          tags: sports.join(","),
+          page_size: 20,
+        },
+      });
+    } else if (hasCommonTagsWithCategory(shooter, commonTags)) {
+      console.log("Shooter türü eşleşti.");
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          tags: shooter.join(","),
+          page_size: 20,
+        },
+      });
+    } else if (hasCommonTagsWithCategory(indi, commonTags)) {
+      console.log("Indie türü eşleşti.");
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          tags: indi.join(","),
+          page_size: 20,
+        },
+      });
+    } else if (commonTags.length >= 2) {
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          tags: commonTags.join(","),
+          page_size: 20,
+        },
+      });
+    } else if (commonTags.length === 1) {
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          tags: commonTags[0],
+          page_size: 20,
+        },
+      });
+    } else if (commonGenres.length > 0) {
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          genres: commonGenres.join(","),
+          page_size: 20,
+        },
+      });
+    } else {
+      data = await $fetch("https://api.rawg.io/api/games", {
+        params: {
+          key: api_key,
+          page_size: 20,
+          ordering: "-added",
+        },
+      });
+    }
+
+    gameResults.value = data.results || [];
+
+    if (gameResults.value.length === 0) {
+      console.log("Oyun bulunamadı!");
+    }
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    isAnim.value = false;
+  }
+};
+
+const clear = () => {
+  primaryGame.value.item = null;
+  secondaryGame.value.item = null;
+  gameResults.value = [];
+};
+
+watch(
+  [() => primaryGame.value.item, () => secondaryGame.value.item],
+  ([newPrimary, newSecondary]) => {
+    if (newPrimary && newSecondary) {
+      findGamesWithCommonTags();
+    }
+  }
+);
+</script>
+
 <template>
   <Loading v-if="isLoading" />
 
@@ -29,15 +259,9 @@
   </v-row>
 
   <!-- select games -->
-  <v-row class="d-flex d-sm-none justify-center align-center ga-3 my-2">
+  <v-row class="d-flex d-sm-none justify-center align-center my-2">
     <v-btn
-      @click="getRandomGame"
-      class="rounded-lg transition"
-      color="cyan"
-      prepend-icon="mdi-magnify"
-      text="random"
-    />
-    <v-btn
+      v-if="primaryGame.item && secondaryGame.item"
       @click="clear"
       class="rounded-lg transition"
       color="error"
@@ -145,15 +369,8 @@
         width="50"
         src="https://cdn1.iconfinder.com/data/icons/basic-ui-elements-28/512/1034_Add_new_plus_sign-512.png"
       />
-      <span class="d-none d-sm-flex text-caption text-sm-subtitle-1">or try a</span>
       <v-btn
-        @click="getRandomGame"
-        class="d-none d-sm-flex rounded-lg transition"
-        color="cyan"
-        prepend-icon="mdi-magnify"
-        text="random"
-      />
-      <v-btn
+        v-if="primaryGame.item && secondaryGame.item"
         @click="clear"
         class="d-none d-sm-flex rounded-lg transition"
         color="error"
@@ -327,252 +544,6 @@
 
   <v-responsive v-if="gameResults.length === 0" class="d-flex d-sm-none" height="350" />
 </template>
-
-<script lang="ts" setup>
-definePageMeta({
-  layout: "single-game",
-});
-
-const isLoading = ref(false);
-const isAnim = ref(false);
-const router = useRouter();
-const isSmLoading = ref(false);
-const isSmLoading2 = ref(false);
-const api_key = useRuntimeConfig().app.apiKey;
-const models = ref({
-  primaryGame: "",
-  secondaryGame: "",
-});
-const primaryGame = ref({
-  item: null,
-  img: null,
-});
-const secondaryGame = ref({
-  item: null,
-  img: null,
-});
-const gamesFoundPrimary = ref<any[]>([]);
-const gamesFoundSecondary = ref<any[]>([]);
-const gameResults = ref<any[]>([]);
-
-const searchGame = async () => {
-  try {
-    if (models.value.primaryGame.length > 2) {
-      isSmLoading.value = true;
-      const data = await $fetch("https://api.rawg.io/api/games", {
-        params: {
-          key: api_key,
-          search: models.value.primaryGame,
-        },
-      });
-      gamesFoundPrimary.value = data?.results;
-    } else {
-      gamesFoundPrimary.value = [];
-    }
-  } catch (error: any) {
-    console.log(error.message);
-  } finally {
-    isSmLoading.value = false;
-  }
-};
-
-const searchGame2 = async () => {
-  try {
-    if (models.value.secondaryGame.length > 2) {
-      isSmLoading2.value = true;
-      const data = await $fetch("https://api.rawg.io/api/games", {
-        params: {
-          key: api_key,
-          search: models.value.secondaryGame,
-        },
-      });
-      gamesFoundSecondary.value = data?.results;
-    } else {
-      gamesFoundSecondary.value = [];
-    }
-  } catch (error: any) {
-    console.log(error.message);
-  } finally {
-    isSmLoading2.value = false;
-  }
-};
-
-const setPrimaryGame = (item: any) => {
-  isSmLoading.value = false;
-  primaryGame.value.item = item;
-
-  gamesFoundPrimary.value = [];
-  models.value.primaryGame = "";
-};
-
-const setSecondaryGame = (item: any) => {
-  isSmLoading2.value = false;
-  secondaryGame.value.item = item;
-
-  gamesFoundSecondary.value = [];
-  models.value.secondaryGame = "";
-};
-
-const goToGame1 = () => {
-  primaryGame.value.item?.tags.forEach((tag: any) => {
-    console.log(tag.slug);
-  });
-};
-const goToGame2 = () => {
-  secondaryGame.value.item?.tags.forEach((tag: any) => {
-    console.log(tag.slug);
-  });
-};
-
-const getRandomGame = () => {
-  // todo
-};
-
-const findGamesWithCommonTags = async () => {
-  let horrorTags = ["horror", "zombies", "zombi-2"];
-  let souls = ["souls-like"];
-  let rougeLike = ["rougelike"];
-  let sports = ["basketball", "football", "soccer", "gambling"];
-  let shooter = ["third-person-shooter", "military", "war", "hero-shooter-2", "shooter"];
-  let indi = ["indi-2", "2d", "3d-platformer-2", "parkour", "parkour-2"];
-
-  const primaryTags = primaryGame.value.item?.tags.map((tag: any) => tag.slug) || [];
-  const secondaryTags = secondaryGame.value.item?.tags.map((tag: any) => tag.slug) || [];
-  const primaryGenres =
-    primaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
-  const secondaryGenres =
-    secondaryGame.value.item?.genres.map((genre: any) => genre.slug) || [];
-
-  const commonTags = primaryTags.filter((tag: string) => secondaryTags.includes(tag));
-  const commonGenres = primaryGenres.filter((genre: string) =>
-    secondaryGenres.includes(genre)
-  );
-
-  const hasCommonTagsWithCategory = (categoryTags: string[], tags: string[]) => {
-    return categoryTags.some((tag) => tags.includes(tag));
-  };
-
-  isAnim.value = true;
-
-  try {
-    let data;
-
-    // Tag eşleşmeleriyle oyunları bul
-    if (hasCommonTagsWithCategory(horrorTags, commonTags)) {
-      console.log("Horror türü eşleşti.");
-      data = await $fetch("https://api.rawg.io/api/games", {
-        params: {
-          key: api_key,
-          tags: horrorTags.join(","),
-          page_size: 20,
-        },
-      });
-    } else if (hasCommonTagsWithCategory(souls, commonTags)) {
-      console.log("Souls-like türü eşleşti.");
-      data = await $fetch("https://api.rawg.io/api/games", {
-        params: {
-          key: api_key,
-          tags: souls.join(","),
-          page_size: 20,
-        },
-      });
-    } else if (hasCommonTagsWithCategory(rougeLike, commonTags)) {
-      console.log("Rouge-like türü eşleşti.");
-      data = await $fetch("https://api.rawg.io/api/games", {
-        params: {
-          key: api_key,
-          tags: rougeLike.join(","),
-          page_size: 20,
-        },
-      });
-    } else if (hasCommonTagsWithCategory(sports, commonTags)) {
-      console.log("Sports türü eşleşti.");
-      data = await $fetch("https://api.rawg.io/api/games", {
-        params: {
-          key: api_key,
-          tags: sports.join(","),
-          page_size: 20,
-        },
-      });
-    } else if (hasCommonTagsWithCategory(shooter, commonTags)) {
-      console.log("Shooter türü eşleşti.");
-      data = await $fetch("https://api.rawg.io/api/games", {
-        params: {
-          key: api_key,
-          tags: shooter.join(","),
-          page_size: 20,
-        },
-      });
-    } else if (hasCommonTagsWithCategory(indi, commonTags)) {
-      console.log("Indie türü eşleşti.");
-      data = await $fetch("https://api.rawg.io/api/games", {
-        params: {
-          key: api_key,
-          tags: indi.join(","),
-          page_size: 20,
-        },
-      });
-    } else if (commonTags.length >= 2) {
-      data = await $fetch("https://api.rawg.io/api/games", {
-        params: {
-          key: api_key,
-          tags: commonTags.join(","),
-          page_size: 20,
-        },
-      });
-    } else if (commonTags.length === 1) {
-      data = await $fetch("https://api.rawg.io/api/games", {
-        params: {
-          key: api_key,
-          tags: commonTags[0],
-          page_size: 20,
-        },
-      });
-    } else if (commonGenres.length > 0) {
-      data = await $fetch("https://api.rawg.io/api/games", {
-        params: {
-          key: api_key,
-          genres: commonGenres.join(","),
-          page_size: 20,
-        },
-      });
-    } else {
-      data = await $fetch("https://api.rawg.io/api/games", {
-        params: {
-          key: api_key,
-          page_size: 20,
-          ordering: "-added",
-        },
-      });
-    }
-
-    gameResults.value = data.results || [];
-
-    if (gameResults.value.length === 0) {
-      console.log("Oyun bulunamadı!");
-    }
-  } catch (error: any) {
-    console.log(error.message);
-  } finally {
-    isAnim.value = false;
-  }
-};
-
-const clear = () => {
-  primaryGame.value.item = null;
-  secondaryGame.value.item = null;
-  gameResults.value = [];
-};
-
-watch(
-  [() => primaryGame.value.item, () => secondaryGame.value.item],
-  ([newPrimary, newSecondary]) => {
-    if (newPrimary && newSecondary) {
-      findGamesWithCommonTags();
-    }
-  }
-);
-</script>
 
 <style scoped>
 @import url(/assets/css/main.css);

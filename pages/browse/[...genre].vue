@@ -1,3 +1,121 @@
+<script lang="ts" setup>
+import imgNull from "~/assets/img/imgNull.jpg";
+import {
+  getFirestore,
+  query,
+  collection,
+  where,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+
+definePageMeta({
+  layout: "single-game",
+});
+
+const route = useRoute();
+const router = useRouter();
+const isLoading = ref(false);
+const previousPageUrl = ref(null);
+const nextPageUrl = ref(null);
+const gamesList = ref(null);
+
+const db = getFirestore();
+const auth = getAuth();
+const colRef = collection(db, "favorites");
+const isAlreadyFavorite = ref(false);
+const isInfo = ref(false);
+const info = ref({
+  msg: "",
+  state: "",
+});
+
+useHead({
+  title: `GKGames - ${route.query.name} Games`,
+});
+
+const getGenres = async () => {
+  try {
+    isLoading.value = true;
+    const data = await $fetch(route.query.endPoint as string);
+    previousPageUrl.value = data?.previous;
+    nextPageUrl.value = data?.next;
+    gamesList.value = data;
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const getAllGamesForPage = async (page: any) => {
+  try {
+    isLoading.value = true;
+    const data = await $fetch(page);
+    previousPageUrl.value = data?.previous;
+    nextPageUrl.value = data?.next;
+    gamesList.value = data;
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const checkIfFavorite = async (item: any) => {
+  const userId = auth.currentUser?.uid;
+  if (!userId) return;
+
+  const q = query(colRef, where("userId", "==", userId), where("item.id", "==", item.id));
+  const querySnapshot = await getDocs(q);
+
+  isAlreadyFavorite.value = !querySnapshot.empty;
+};
+
+const handleFavorite = async (item: any) => {
+  try {
+    const userId = auth.currentUser?.uid;
+    const q = query(
+      colRef,
+      where("userId", "==", userId),
+      where("item.id", "==", item.id)
+    );
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      await addDoc(colRef, {
+        userId: userId,
+        item: item,
+      });
+
+      info.value.msg = "This item has been added to your favorite list";
+      info.value.state = "success";
+      isInfo.value = true;
+    } else {
+      querySnapshot.forEach(async (docSnapshot) => {
+        try {
+          await deleteDoc(doc(colRef, docSnapshot.id));
+        } catch (deleteError) {
+          console.error("Error deleting document: ", deleteError);
+        }
+      });
+      info.value.msg = "This item has been removed from your favorite list";
+      info.value.state = "error";
+      isInfo.value = true;
+    }
+  } catch (error) {
+    console.error("Error handling favorite: ", error);
+  }
+};
+onMounted(async () => {
+  await nextTick();
+  getGenres();
+});
+</script>
+
 <template>
   <Loading v-if="isLoading" />
   <v-row
@@ -44,19 +162,19 @@
       <img
         height="250"
         width="100%"
-        :src="item.background_image"
+        :src="item.background_image ? item.background_image : imgNull"
         class="image cursor-pointer transition rounded-lg transition d-flex d-lg-none"
       />
       <img
         height="275"
         width="100%"
-        :src="item.background_image"
+        :src="item.background_image ? item.background_image : imgNull"
         class="image cursor-pointer transition rounded-lg transition d-none d-lg-flex d-xl-none"
       />
       <img
         height="350"
         width="100%"
-        :src="item.background_image"
+        :src="item.background_image ? item.background_image : imgNull"
         class="image cursor-pointer transition rounded-lg transition d-none d-xl-flex"
       />
       <v-icon
@@ -162,124 +280,6 @@
     >{{ info.msg }}</v-snackbar
   >
 </template>
-
-<script lang="ts" setup>
-import {
-  getFirestore,
-  query,
-  collection,
-  where,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
-import { getAuth } from "firebase/auth";
-
-definePageMeta({
-  layout: "single-game",
-});
-
-const route = useRoute();
-const router = useRouter();
-const isLoading = ref(false);
-const previousPageUrl = ref(null);
-const nextPageUrl = ref(null);
-const gamesList = ref(null);
-
-const db = getFirestore();
-const auth = getAuth();
-const colRef = collection(db, "favorites");
-const isAlreadyFavorite = ref(false);
-const isInfo = ref(false);
-const info = ref({
-  msg: "",
-  state: "",
-});
-
-useHead({
-  title: `GKGames - ${route.query.name} Games`,
-});
-
-
-const getGenres = async () => {
-  try {
-    isLoading.value = true;
-    const data = await $fetch(route.query.endPoint as string);
-    previousPageUrl.value = data?.previous;
-    nextPageUrl.value = data?.next;
-    gamesList.value = data;
-  } catch (error: any) {
-    console.log(error.message);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const getAllGamesForPage = async (page: any) => {
-  try {
-    isLoading.value = true;
-    const data = await $fetch(page);
-    previousPageUrl.value = data?.previous;
-    nextPageUrl.value = data?.next;
-    gamesList.value = data;
-  } catch (error: any) {
-    console.log(error.message);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const checkIfFavorite = async (item: any) => {
-  const userId = auth.currentUser?.uid;
-  if (!userId) return;
-
-  const q = query(colRef, where("userId", "==", userId), where("item.id", "==", item.id));
-  const querySnapshot = await getDocs(q);
-
-  isAlreadyFavorite.value = !querySnapshot.empty;
-};
-
-const handleFavorite = async (item: any) => {
-  try {
-    const userId = auth.currentUser?.uid;
-    const q = query(
-      colRef,
-      where("userId", "==", userId),
-      where("item.id", "==", item.id)
-    );
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-      await addDoc(colRef, {
-        userId: userId,
-        item: item,
-      });
-
-      info.value.msg = "This item has been added to your favorite list";
-      info.value.state = "success";
-      isInfo.value = true;
-    } else {
-      querySnapshot.forEach(async (docSnapshot) => {
-        try {
-          await deleteDoc(doc(colRef, docSnapshot.id));
-        } catch (deleteError) {
-          console.error("Error deleting document: ", deleteError);
-        }
-      });
-      info.value.msg = "This item has been removed from your favorite list";
-      info.value.state = "error";
-      isInfo.value = true;
-    }
-  } catch (error) {
-    console.error("Error handling favorite: ", error);
-  }
-};
-onMounted(async () => {
-  await nextTick();
-  getGenres();
-});
-</script>
 
 <style scoped>
 @import url(/assets/css/main.css);

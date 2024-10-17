@@ -1,3 +1,86 @@
+<script lang="ts" setup>
+import store from "~/store/store";
+import imgNull from "~/assets/img/imgNull.jpg";
+import {
+  getFirestore,
+  query,
+  collection,
+  where,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+
+useHead({
+  title: "GKGames - All Games",
+});
+
+const router = useRouter();
+const _store = store();
+
+const db = getFirestore();
+const auth = getAuth();
+const colRef = collection(db, "favorites");
+const isAlreadyFavorite = ref(false);
+const isInfo = ref(false);
+const info = ref({
+  msg: "",
+  state: "",
+});
+
+const checkIfFavorite = async (item: any) => {
+  const userId = auth.currentUser?.uid;
+  if (!userId) return;
+
+  const q = query(colRef, where("userId", "==", userId), where("item.id", "==", item.id));
+  const querySnapshot = await getDocs(q);
+
+  isAlreadyFavorite.value = !querySnapshot.empty;
+};
+
+const handleFavorite = async (item: any) => {
+  try {
+    const userId = auth.currentUser?.uid;
+    const q = query(
+      colRef,
+      where("userId", "==", userId),
+      where("item.id", "==", item.id)
+    );
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      await addDoc(colRef, {
+        userId: userId,
+        item: item,
+      });
+
+      info.value.msg = "This item has been added to your favorite list";
+      info.value.state = "success";
+      isInfo.value = true;
+    } else {
+      querySnapshot.forEach(async (docSnapshot) => {
+        try {
+          await deleteDoc(doc(colRef, docSnapshot.id));
+        } catch (deleteError) {
+          console.error("Error deleting document: ", deleteError);
+        }
+      });
+      info.value.msg = "This item has been removed from your favorite list";
+      info.value.state = "error";
+      isInfo.value = true;
+    }
+  } catch (error) {
+    console.error("Error handling favorite: ", error);
+  }
+};
+
+onMounted(() => {
+  _store.getAllGames(_store.currentPageUrl);
+});
+</script>
+
 <template>
   <Loading v-if="_store.isLoading" />
 
@@ -20,19 +103,19 @@
       <img
         height="250"
         width="100%"
-        :src="item.background_image"
+        :src="item.background_image ? item.background_image : imgNull"
         class="image d-flex d-lg-none cursor-pointer transition rounded-lg transition"
       />
       <img
         height="275"
         width="100%"
-        :src="item.background_image"
+        :src="item.background_image ? item.background_image : imgNull"
         class="image d-none d-lg-flex d-xl-none cursor-pointer transition rounded-lg transition"
       />
       <img
         height="350"
         width="100%"
-        :src="item.background_image"
+        :src="item.background_image ? item.background_image : imgNull"
         class="image d-none d-xl-flex cursor-pointer transition rounded-lg transition"
       />
       <v-icon
@@ -148,88 +231,6 @@
     >{{ info.msg }}</v-snackbar
   >
 </template>
-
-<script lang="ts" setup>
-import store from "~/store/store";
-import {
-  getFirestore,
-  query,
-  collection,
-  where,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
-import { getAuth } from "firebase/auth";
-
-useHead({
-  title: "GKGames - All Games",
-});
-
-const router = useRouter();
-const _store = store();
-
-const db = getFirestore();
-const auth = getAuth();
-const colRef = collection(db, "favorites");
-const isAlreadyFavorite = ref(false);
-const isInfo = ref(false);
-const info = ref({
-  msg: "",
-  state: "",
-});
-
-const checkIfFavorite = async (item: any) => {
-  const userId = auth.currentUser?.uid;
-  if (!userId) return;
-
-  const q = query(colRef, where("userId", "==", userId), where("item.id", "==", item.id));
-  const querySnapshot = await getDocs(q);
-
-  isAlreadyFavorite.value = !querySnapshot.empty;
-};
-
-const handleFavorite = async (item: any) => {
-  try {
-    const userId = auth.currentUser?.uid;
-    const q = query(
-      colRef,
-      where("userId", "==", userId),
-      where("item.id", "==", item.id)
-    );
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-      await addDoc(colRef, {
-        userId: userId,
-        item: item,
-      });
-
-      info.value.msg = "This item has been added to your favorite list";
-      info.value.state = "success";
-      isInfo.value = true;
-    } else {
-      querySnapshot.forEach(async (docSnapshot) => {
-        try {
-          await deleteDoc(doc(colRef, docSnapshot.id));
-        } catch (deleteError) {
-          console.error("Error deleting document: ", deleteError);
-        }
-      });
-      info.value.msg = "This item has been removed from your favorite list";
-      info.value.state = "error";
-      isInfo.value = true;
-    }
-  } catch (error) {
-    console.error("Error handling favorite: ", error);
-  }
-};
-
-onMounted(() => {
-  _store.getAllGames(_store.currentPageUrl);
-});
-</script>
 
 <style scoped>
 @import url(/assets/css/main.css);

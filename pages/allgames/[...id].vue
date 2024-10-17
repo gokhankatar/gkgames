@@ -1,3 +1,117 @@
+<script lang="ts" setup>
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import imgNull from "~/assets/img/imgNull.jpg";
+import {
+  getFirestore,
+  query,
+  collection,
+  where,
+  getDocs,
+  deleteDoc,
+  doc,
+  setDoc,
+} from "firebase/firestore";
+
+definePageMeta({
+  layout: "single-game",
+});
+
+const router = useRouter();
+const route = useRoute();
+const isLoading = ref(false);
+const requirements = ref(false);
+const isAlreadyFavorite = ref(false);
+const isInfo = ref(false);
+const info = ref({
+  msg: "",
+  state: "",
+});
+const auth = getAuth();
+const db = getFirestore();
+const colRef = collection(db, "favorites");
+
+const game = computed(() => {
+  const gameData = route.query.game;
+  try {
+    isLoading.value = true;
+    return typeof gameData === "string" ? JSON.parse(gameData) : null;
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    isLoading.value = false;
+  }
+});
+
+useHead({
+  title: `GKGames - ${game.value?.name}`,
+});
+
+const handleReq = async () => {
+  await game.value.platforms.forEach((g: any) => {
+    if (g.requirements_en) {
+      requirements.value = true;
+    }
+  });
+};
+
+const thumbsSwiper = ref(null);
+
+const setThumbsSwiper = (swiper: any) => {
+  thumbsSwiper.value = swiper;
+};
+
+const checkIfFavorite = async () => {
+  const userId = auth.currentUser?.uid;
+  if (!userId || !game.value) return;
+
+  const q = query(
+    colRef,
+    where("userId", "==", userId),
+    where("item.id", "==", game.value.id)
+  );
+  const querySnapshot = await getDocs(q);
+
+  isAlreadyFavorite.value = !querySnapshot.empty;
+};
+
+const handleFavorite = async () => {
+  const userId = auth.currentUser?.uid;
+  if (!userId || !game.value) {
+    info.value.msg = "You should login";
+    info.value.state = "error";
+    isInfo.value = true;
+  }
+
+  const docRef = doc(colRef, `${userId}_${game.value.id}`);
+
+  if (isAlreadyFavorite.value) {
+    await deleteDoc(docRef);
+    isAlreadyFavorite.value = false;
+    info.value.msg = "This item has been removed from your favorite list";
+    info.value.state = "error";
+    isInfo.value = true;
+  } else {
+    await setDoc(docRef, {
+      userId,
+      item: game.value,
+    });
+    isAlreadyFavorite.value = true;
+    info.value.msg = "This item has been added to your favorite list";
+    info.value.state = "success";
+    isInfo.value = true;
+  }
+};
+
+onMounted(async () => {
+  await nextTick();
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      checkIfFavorite();
+    }
+  });
+});
+</script>
+
 <template>
   <Loading v-if="isLoading" />
   <v-row
@@ -57,6 +171,7 @@
           <v-icon icon="mdi-arrow-right" size="x-large" />
         </div>
         <swiper-slide
+          v-if="game.short_screenshots.length > 0"
           class="mySwiper"
           v-for="(slide, index) in game.short_screenshots"
           :key="index"
@@ -73,6 +188,10 @@
             :src="slide.image"
             cover
           />
+        </swiper-slide>
+        <swiper-slide class="mySwiper" v-if="game.short_screenshots.length == 0">
+          <v-img height="50vh" class="d-none d-sm-flex rounded-lg" :src="imgNull" cover />
+          <v-img height="40vh" class="d-flex d-sm-none rounded-lg" :src="imgNull" cover />
         </swiper-slide>
       </swiper>
 
@@ -254,119 +373,6 @@
     >{{ info.msg }}</v-snackbar
   >
 </template>
-
-<script lang="ts" setup>
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import {
-  getFirestore,
-  query,
-  collection,
-  where,
-  getDocs,
-  deleteDoc,
-  doc,
-  setDoc,
-} from "firebase/firestore";
-
-definePageMeta({
-  layout: "single-game",
-});
-
-const router = useRouter();
-const route = useRoute();
-const isLoading = ref(false);
-const requirements = ref(false);
-const isAlreadyFavorite = ref(false);
-const isInfo = ref(false);
-const info = ref({
-  msg: "",
-  state: "",
-});
-const auth = getAuth();
-const db = getFirestore();
-const colRef = collection(db, "favorites");
-
-const game = computed(() => {
-  const gameData = route.query.game;
-  try {
-    isLoading.value = true;
-    return typeof gameData === "string" ? JSON.parse(gameData) : null;
-  } catch (error: any) {
-    console.log(error.message);
-  } finally {
-    isLoading.value = false;
-  }
-});
-
-useHead({
-  title: `GKGames - ${game.value?.name}`,
-});
-
-const handleReq = async () => {
-  await game.value.platforms.forEach((g: any) => {
-    if (g.requirements_en) {
-      requirements.value = true;
-    }
-  });
-};
-
-const thumbsSwiper = ref(null);
-
-const setThumbsSwiper = (swiper: any) => {
-  thumbsSwiper.value = swiper;
-};
-
-const checkIfFavorite = async () => {
-  const userId = auth.currentUser?.uid;
-  if (!userId || !game.value) return;
-
-  const q = query(
-    colRef,
-    where("userId", "==", userId),
-    where("item.id", "==", game.value.id)
-  );
-  const querySnapshot = await getDocs(q);
-
-  isAlreadyFavorite.value = !querySnapshot.empty;
-};
-
-const handleFavorite = async () => {
-  const userId = auth.currentUser?.uid;
-  if (!userId || !game.value) {
-    info.value.msg = "You should login";
-    info.value.state = "error";
-    isInfo.value = true;
-  }
-
-  const docRef = doc(colRef, `${userId}_${game.value.id}`);
-
-  if (isAlreadyFavorite.value) {
-    await deleteDoc(docRef);
-    isAlreadyFavorite.value = false;
-    info.value.msg = "This item has been removed from your favorite list";
-    info.value.state = "error";
-    isInfo.value = true;
-  } else {
-    await setDoc(docRef, {
-      userId,
-      item: game.value,
-    });
-    isAlreadyFavorite.value = true;
-    info.value.msg = "This item has been added to your favorite list";
-    info.value.state = "success";
-    isInfo.value = true;
-  }
-};
-
-onMounted(async () => {
-  await nextTick();
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      checkIfFavorite();
-    }
-  });
-});
-</script>
 
 <style scoped>
 .card-req {

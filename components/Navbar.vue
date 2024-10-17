@@ -276,6 +276,7 @@ onMounted(() => {
         </v-menu>
       </div>
     </template>
+    
   </v-app-bar>
 
   <v-row class="navbar-search d-flex justify-space-between align-center mt-5 mt-sm-0">
@@ -352,6 +353,7 @@ onMounted(() => {
         >Browse</span
       >
       <v-badge
+        v-if="isUser"
         class="badge-new d-none d-sm-flex transition"
         content="NEW"
         color="cyan"
@@ -366,7 +368,7 @@ onMounted(() => {
       </v-badge>
     </v-row>
   </v-row>
-  
+
   <v-row class="my-5 d-flex d-sm-none justify-center align-center">
     <v-col cols="12">
       <v-btn

@@ -1,11 +1,11 @@
 {
-  "name": "nuxt-app",
+  "name": "gkgames",
   "author": {
     "name": "Gokhan",
     "surname": "Katar",
     "title": "Front End Developer",
     "email": "katar_gokhan@hotmail.com",
-    "twitter": "gokhan_crypto"
+    "twitter": "gokhan_vue"
   },
   "private": true,
   "type": "module",
