@@ -310,7 +310,7 @@ onMounted(async () => {
       </div>
 
       <!-- stores -->
-      <div v-if="game.stores" class="d-flex justify-start align-center ga-5">
+      <div v-if="game.stores" class="d-flex flex-wrap justify-start align-center ga-2">
         <span class="text-grey">Stores: </span>
         <v-chip
           color="cyan"
