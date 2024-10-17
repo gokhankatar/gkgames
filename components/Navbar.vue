@@ -276,7 +276,6 @@ onMounted(() => {
         </v-menu>
       </div>
     </template>
-    
   </v-app-bar>
 
   <v-row class="navbar-search d-flex justify-space-between align-center mt-5 mt-sm-0">
@@ -369,7 +368,7 @@ onMounted(() => {
     </v-row>
   </v-row>
 
-  <v-row class="my-5 d-flex d-sm-none justify-center align-center">
+  <v-row v-if="isUser" class="my-5 d-flex d-sm-none justify-center align-center">
     <v-col cols="12">
       <v-btn
         @click="router.replace('/gamemixer')"

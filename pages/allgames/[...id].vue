@@ -255,14 +255,15 @@ onMounted(async () => {
       <!-- stores -->
       <div v-if="game.stores" class="d-flex justify-start align-center ga-5">
         <span class="text-grey">Stores: </span>
-        <a
+        <v-chip
+          color="cyan"
           v-for="store of game?.stores"
           :href="`https://${store.store.domain}`"
           target="_blank"
           class="store-text d-inline transition text-subtitle-2 text-sm-subtitle-1"
         >
           {{ store.store.name }}
-        </a>
+        </v-chip>
       </div>
 
       <!-- platforms -->
